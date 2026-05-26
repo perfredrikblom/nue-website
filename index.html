@@ -13,77 +13,90 @@
 <body>
 
   <script>
-    const Engine = Matter.Engine;
-    const Render = Matter.Render;
-    const World = Matter.World;
-    const Bodies = Matter.Bodies;
-    const Body = Matter.Body;
-    const Mouse = Matter.Mouse;
-    const MouseConstraint = Matter.MouseConstraint;
+    let engine, render, logoBody, ground;
 
-    const engine = Engine.create();
-    engine.gravity.y = 1.8;        // More natural speed
+    function initPhysics() {
+      if (render) Render.stop(render);
+      if (engine) Engine.clear(engine);
 
-    const render = Render.create({
-      element: document.body,
-      engine: engine,
-      options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: false,
-        background: '#0A3D2B'
-      }
-    });
+      engine = Engine.create();
+      engine.gravity.y = 1.85;           // Natural feel
 
-    // Ground — exactly at bottom of window
-    const ground = Bodies.rectangle(
-      window.innerWidth / 2, 
-      window.innerHeight - 25, 
-      window.innerWidth * 2, 
-      80, 
-      { 
-        isStatic: true,
-        restitution: 0.75,      // Stronger bounce
-        render: { visible: false }
-      }
-    );
-    World.add(engine.world, ground);
-
-    // Logo
-    const logoBody = Bodies.rectangle(window.innerWidth / 2, 120, 420, 160, {
-      restitution: 0.72,
-      friction: 0.3,
-      render: {
-        sprite: {
-          texture: 'nue-logo.png',
-          xScale: 0.9,
-          yScale: 0.9
+      render = Render.create({
+        element: document.body,
+        engine: engine,
+        options: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+          wireframes: false,
+          background: '#0A3D2B'
         }
-      }
-    });
+      });
 
-    World.add(engine.world, logoBody);
+      // Ground - follows window bottom
+      ground = Bodies.rectangle(
+        window.innerWidth / 2, 
+        window.innerHeight - 40, 
+        window.innerWidth * 2, 
+        100, 
+        { 
+          isStatic: true,
+          restitution: 0.68,
+          render: { visible: false }
+        }
+      );
 
-    // Mouse drag
-    const mouse = Mouse.create(render.canvas);
-    const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
-    World.add(engine.world, mouseConstraint);
+      World.add(engine.world, ground);
 
-    Engine.run(engine);
-    Render.run(render);
+      // Logo
+      logoBody = Bodies.rectangle(window.innerWidth / 2, 120, 420, 160, {
+        restitution: 0.65,
+        friction: 0.28,
+        render: {
+          sprite: {
+            texture: 'nue-logo.png',
+            xScale: 0.9,
+            yScale: 0.9
+          }
+        }
+      });
+
+      World.add(engine.world, logoBody);
+
+      // Mouse drag
+      const mouse = Mouse.create(render.canvas);
+      const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
+      World.add(engine.world, mouseConstraint);
+
+      Engine.run(engine);
+      Render.run(render);
+    }
+
+    // Initial setup
+    initPhysics();
 
     // Gentle initial drop
     setTimeout(() => {
-      Body.setPosition(logoBody, { x: window.innerWidth / 2, y: 80 });
-      Body.setVelocity(logoBody, { x: 0.5, y: 6 });   // slower, more natural
-    }, 300);
+      if (logoBody) {
+        Body.setVelocity(logoBody, { x: 0.8, y: 7 });
+        Body.setAngularVelocity(logoBody, 0.15);   // slight natural rotation
+      }
+    }, 400);
 
-    // Click = push from current location
+    // Click to push
     document.addEventListener('click', () => {
-      Body.applyForce(logoBody, logoBody.position, {
-        x: (Math.random() - 0.5) * 0.1,
-        y: -0.18
-      });
+      if (logoBody) {
+        Body.applyForce(logoBody, logoBody.position, {
+          x: (Math.random() - 0.5) * 0.12,
+          y: -0.19
+        });
+        Body.setAngularVelocity(logoBody, (Math.random() - 0.5) * 0.4);
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      initPhysics();
     });
   </script>
 </body>
