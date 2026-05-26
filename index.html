@@ -8,21 +8,20 @@
   <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
   <style>
     body { margin: 0; background: #0A3D2B; overflow: hidden; }
+    .debug { position: fixed; top: 10px; left: 10px; color: white; z-index: 100; }
   </style>
 </head>
 <body>
+  <div class="debug">Testing PNG loading...</div>
 
   <script>
     const Engine = Matter.Engine;
     const Render = Matter.Render;
     const World = Matter.World;
     const Bodies = Matter.Bodies;
-    const Body = Matter.Body;
-    const Mouse = Matter.Mouse;
-    const MouseConstraint = Matter.MouseConstraint;
 
     const engine = Engine.create();
-    engine.gravity.y = 2.4;
+    engine.gravity.y = 2.2;
 
     const render = Render.create({
       element: document.body,
@@ -42,69 +41,24 @@
     });
     World.add(engine.world, ground);
 
-    // First logo
-    const logo1 = Bodies.rectangle(window.innerWidth * 0.35, 120, 380, 150, {
-      restitution: 0.52,
-      friction: 0.35,
+    // Test with one logo
+    const logoBody = Bodies.rectangle(window.innerWidth/2, 150, 400, 160, {
+      restitution: 0.5,
       render: {
         sprite: {
-          texture: 'nue-logo.png',
+          texture: 'nue-logo.png',   // Make sure this name is exact
           xScale: 0.9,
           yScale: 0.9
         }
       }
     });
 
-    // Second logo
-    const logo2 = Bodies.rectangle(window.innerWidth * 0.65, 80, 380, 150, {
-      restitution: 0.52,
-      friction: 0.35,
-      render: {
-        sprite: {
-          texture: 'nue-logo-copy.png',
-          xScale: 0.9,
-          yScale: 0.9
-        }
-      }
-    });
-
-    World.add(engine.world, [logo1, logo2]);
-
-    // Mouse drag
-    const mouse = Mouse.create(render.canvas);
-    const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
-    World.add(engine.world, mouseConstraint);
+    World.add(engine.world, logoBody);
 
     Engine.run(engine);
     Render.run(render);
 
-    // Click = Push whichever logo is closest to click position
-    document.addEventListener('click', (e) => {
-      const clickX = e.clientX;
-      const clickY = e.clientY;
-
-      const bodies = [logo1, logo2];
-      let closest = logo1;
-      let minDist = Infinity;
-
-      bodies.forEach(body => {
-        const dx = body.position.x - clickX;
-        const dy = body.position.y - clickY;
-        const dist = dx*dx + dy*dy;
-        if (dist < minDist) {
-          minDist = dist;
-          closest = body;
-        }
-      });
-
-      // Push the closest logo
-      Body.applyForce(closest, closest.position, {
-        x: (Math.random() - 0.5) * 0.12,
-        y: -0.18
-      });
-
-      Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.3);
-    });
+    console.log("✅ Physics running. Check if nue-logo.png loads.");
   </script>
 </body>
 </html>
