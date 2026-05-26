@@ -18,30 +18,17 @@
       border: 1px solid rgba(212, 163, 115, 0.2);
       overflow: hidden;
     }
-    .letter {
-      font-family: 'Playfair Display', serif;
-      font-weight: 900;
-      font-size: 92px;
-      line-height: 1;
-      color: #262626;
-      text-shadow: 0 4px 12px rgba(0,0,0,0.3),
-                   0 0 20px rgba(212, 163, 115, 0.4);
-      pointer-events: none;
-      user-select: none;
-    }
   </style>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 </head>
 <body class="bg-[#0A3D2B] text-white min-h-screen">
 
   <div class="min-h-screen flex flex-col items-center justify-center p-6">
     
     <div class="mb-8 text-center">
-      <h1 class="text-6xl md:text-7xl font-light tracking-[0.5em] mb-3">NUE</h1>
-      <p class="text-[#D4A373] text-xl">Modern Tropical Cuisine • Canggu, Bali</p>
+      <p class="text-[#D4A373] text-xl mb-2">Modern Tropical Cuisine • Canggu, Bali</p>
     </div>
 
-    <!-- Physics Logo -->
+    <!-- Interactive Logo Container -->
     <div id="physics-container"></div>
 
     <div class="flex flex-col sm:flex-row gap-4 mt-12">
@@ -50,8 +37,7 @@
          class="bg-white text-black px-10 py-4 rounded-full text-lg font-medium hover:bg-[#D4A373] transition-all">
         Reserve a Table
       </a>
-      <a href="#menu" 
-         class="border border-white/70 hover:border-white px-10 py-4 rounded-full text-lg font-medium transition-all">
+      <a href="#menu" class="border border-white/70 hover:border-white px-10 py-4 rounded-full text-lg font-medium transition-all">
         View Menu
       </a>
     </div>
@@ -67,7 +53,7 @@
     const MouseConstraint = Matter.MouseConstraint;
 
     const engine = Engine.create();
-    engine.gravity.y = 1.65;
+    engine.gravity.y = 1.6;
 
     const render = Render.create({
       element: document.getElementById('physics-container'),
@@ -81,86 +67,56 @@
     });
 
     // Boundaries
-    const ground = Bodies.rectangle(360, 355, 900, 60, { 
-      isStatic: true, 
-      render: { fillStyle: 'transparent' } 
-    });
-    const leftWall = Bodies.rectangle(-20, 190, 60, 500, { isStatic: true, render: { visible: false } });
-    const rightWall = Bodies.rectangle(740, 190, 60, 500, { isStatic: true, render: { visible: false } });
+    const ground = Bodies.rectangle(360, 355, 900, 60, { isStatic: true, render: { fillStyle: 'transparent' }});
+    const leftWall = Bodies.rectangle(-20, 190, 60, 500, { isStatic: true, render: { visible: false }});
+    const rightWall = Bodies.rectangle(740, 190, 60, 500, { isStatic: true, render: { visible: false }});
 
     World.add(engine.world, [ground, leftWall, rightWall]);
 
-    // Letters with better proportions
-    const n = Bodies.rectangle(190, 100, 88, 165, {
-      restitution: 0.62,
-      friction: 0.15,
-      chamfer: { radius: 8 },
-      render: { fillStyle: '#1F1F1F' }
+    // Create 3 separate bodies for N, U, E using your logo colors
+    const n = Bodies.rectangle(190, 100, 95, 170, {
+      restitution: 0.6,
+      friction: 0.2,
+      chamfer: { radius: 15 },
+      render: { fillStyle: '#262626' }
     });
 
-    const u = Bodies.rectangle(340, 95, 88, 165, {
+    const u = Bodies.rectangle(340, 100, 90, 170, {
       restitution: 0.65,
-      friction: 0.15,
-      chamfer: { radius: 8 },
-      render: { fillStyle: '#1F1F1F' }
+      friction: 0.2,
+      chamfer: { radius: 15 },
+      render: { fillStyle: '#262626' }
     });
 
-    const e = Bodies.rectangle(490, 105, 88, 165, {
-      restitution: 0.62,
-      friction: 0.15,
-      chamfer: { radius: 8 },
-      render: { fillStyle: '#1F1F1F' }
+    const e = Bodies.rectangle(490, 100, 95, 170, {
+      restitution: 0.6,
+      friction: 0.2,
+      chamfer: { radius: 15 },
+      render: { fillStyle: '#262626' }
     });
 
     World.add(engine.world, [n, u, e]);
 
-    // Add elegant labels
-    function addLabel(body, text) {
-      const label = document.createElement('div');
-      label.className = 'letter';
-      label.textContent = text;
-      document.getElementById('physics-container').appendChild(label);
-      
-      Matter.Events.on(engine, 'afterUpdate', () => {
-        const pos = body.position;
-        const angle = body.angle * (180 / Math.PI);
-        label.style.left = `${pos.x - 42}px`;
-        label.style.top = `${pos.y - 58}px`;
-        label.style.transform = `rotate(${angle}deg)`;
-      });
-    }
-
-    addLabel(n, 'N');
-    addLabel(u, 'U');
-    addLabel(e, 'E');
-
-    // Mouse / Touch interaction
+    // Mouse drag support
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, {
       mouse: mouse,
-      constraint: { stiffness: 0.85 }
+      constraint: { stiffness: 0.9 }
     });
     World.add(engine.world, mouseConstraint);
 
     Engine.run(engine);
     Render.run(render);
 
-    // Double-click to reset fall
+    // Double-click to drop again
     render.canvas.addEventListener('dblclick', () => {
-      [n, u, e].forEach((body, i) => {
-        Body.setPosition(body, { 
-          x: 150 + Math.random() * 420, 
-          y: 40 + Math.random() * 80 
-        });
-        Body.setVelocity(body, { 
-          x: (Math.random() - 0.5) * 12, 
-          y: -14 - Math.random() * 6 
-        });
-        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.5);
+      [n, u, e].forEach(body => {
+        Body.setPosition(body, { x: 150 + Math.random() * 420, y: 50 });
+        Body.setVelocity(body, { x: (Math.random() - 0.5) * 12, y: -16 });
       });
     });
 
-    console.log("✅ Visual improvements applied.");
+    console.log("✅ Using your logo colors + softer shapes");
   </script>
 </body>
 </html>
