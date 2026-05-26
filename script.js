@@ -1,83 +1,91 @@
 // script.js
-const Engine = Matter.Engine;
-const Render = Matter.Render;
-const World = Matter.World;
-const Bodies = Matter.Bodies;
-const Body = Matter.Body;
-const Mouse = Matter.Mouse;
-const MouseConstraint = Matter.MouseConstraint;
+let engine, render, letters = [], ground;
 
-const engine = Engine.create();
-engine.gravity.y = 2.1;
+function initPhysics() {
+  if (render) Render.stop(render);
+  if (engine) Engine.clear(engine);
 
-const render = Render.create({
-  element: document.body,
-  engine: engine,
-  options: {
-    width: window.innerWidth,
-    height: window.innerHeight,
-    wireframes: false,
-    background: '#0A3D2B'
-  }
-});
+  engine = Engine.create();
+  engine.gravity.y = 2.1;
 
-// Ground
-const ground = Bodies.rectangle(window.innerWidth/2, window.innerHeight - 40, window.innerWidth*2, 100, {
-  isStatic: true,
-  restitution: 0.65,
-  render: { visible: false }
-});
-World.add(engine.world, ground);
-
-// Letters
-const letters = [];
-
-const createLetter = (x, y, texture) => {
-  const body = Bodies.rectangle(x, y, 130, 180, {
-    restitution: 0.62,
-    friction: 0.3,
-    render: {
-      sprite: { texture: texture, xScale: 1, yScale: 1 }
+  render = Render.create({
+    element: document.body,
+    engine: engine,
+    options: {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      wireframes: false,
+      background: '#0A3D2B'
     }
   });
-  letters.push(body);
-  World.add(engine.world, body);
-};
 
-createLetter(window.innerWidth * 0.32, 120, 'assets/n.png');
-createLetter(window.innerWidth * 0.5,  100, 'assets/u.png');
-createLetter(window.innerWidth * 0.68, 130, 'assets/e.png');
+  // Ground - always at bottom
+  ground = Bodies.rectangle(
+    window.innerWidth / 2, 
+    window.innerHeight - 40, 
+    window.innerWidth * 2, 
+    100, 
+    { isStatic: true, restitution: 0.65, render: { visible: false } }
+  );
+  World.add(engine.world, ground);
 
-// Mouse drag
-const mouse = Mouse.create(render.canvas);
-const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
-World.add(engine.world, mouseConstraint);
+  // Clear old letters
+  letters.forEach(l => World.remove(engine.world, l));
+  letters = [];
 
-Engine.run(engine);
-Render.run(render);
+  const centerX = window.innerWidth / 2;
+  const spacing = Math.min(160, window.innerWidth / 4);
+
+  // Create / Recreate letters centered
+  const createLetter = (offsetX, texture) => {
+    const body = Bodies.rectangle(centerX + offsetX, 120, 130, 180, {
+      restitution: 0.62,
+      friction: 0.3,
+      render: {
+        sprite: { texture: texture, xScale: 1, yScale: 1 }
+      }
+    });
+    letters.push(body);
+    World.add(engine.world, body);
+  };
+
+  createLetter(-spacing, 'assets/n.png');
+  createLetter(0, 'assets/u.png');
+  createLetter(spacing, 'assets/e.png');
+
+  // Mouse drag
+  const mouse = Mouse.create(render.canvas);
+  const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
+  World.add(engine.world, mouseConstraint);
+
+  Engine.run(engine);
+  Render.run(render);
+}
+
+// Initial setup
+initPhysics();
 
 // Initial drop
 setTimeout(() => {
   letters.forEach((letter, i) => {
-    Body.setVelocity(letter, { x: (i - 1) * 1.5, y: 7 + Math.random() * 3 });
+    Body.setVelocity(letter, { 
+      x: (i - 1) * 2, 
+      y: 8 + Math.random() * 4 
+    });
   });
-}, 400);
+}, 300);
 
-// Click / Tap → Only affect the CLOSEST letter
+// Click → push closest letter
 document.addEventListener('click', (e) => {
-  const clickX = e.clientX;
-  const clickY = e.clientY;
-
   let closest = null;
-  let minDistance = Infinity;
+  let minDist = Infinity;
 
   letters.forEach(letter => {
-    const dx = letter.position.x - clickX;
-    const dy = letter.position.y - clickY;
-    const distance = dx * dx + dy * dy;
-
-    if (distance < minDistance) {
-      minDistance = distance;
+    const dx = letter.position.x - e.clientX;
+    const dy = letter.position.y - e.clientY;
+    const dist = dx*dx + dy*dy;
+    if (dist < minDist) {
+      minDist = dist;
       closest = letter;
     }
   });
@@ -89,4 +97,9 @@ document.addEventListener('click', (e) => {
     });
     Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.45);
   }
+});
+
+// Handle window resize properly
+window.addEventListener('resize', () => {
+  initPhysics();
 });
