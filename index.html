@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NUE - Canggu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
+  <style>
+    body { font-family: system-ui, sans-serif; }
+    #physics-container { width: 100%; max-width: 720px; height: 340px; margin: 0 auto; background: rgba(0,0,0,0.3); border-radius: 20px; }
+  </style>
+</head>
+<body class="bg-[#0A3D2B] text-white min-h-screen">
+
+  <div class="min-h-screen flex flex-col items-center justify-center p-6">
+    
+    <div class="mb-8 text-center">
+      <h1 class="text-5xl md:text-6xl font-light tracking-widest mb-2">NUE</h1>
+      <p class="text-[#D4A373]">Modern Tropical Cuisine • Canggu, Bali</p>
+    </div>
+
+    <!-- Physics Logo -->
+    <div id="physics-container"></div>
+
+    <div class="flex flex-col sm:flex-row gap-4 mt-12">
+      <a href="https://octotable.com/book/restaurant/1000969/booking/new" 
+         target="_blank"
+         class="bg-white text-black px-10 py-4 rounded-full text-lg font-medium hover:bg-[#D4A373] transition">
+        Reserve a Table
+      </a>
+      <a href="#menu" class="border border-white px-10 py-4 rounded-full text-lg font-medium hover:bg-white/10 transition">
+        View Menu
+      </a>
+    </div>
+  </div>
+
+  <script>
+    const Engine = Matter.Engine;
+    const Render = Matter.Render;
+    const World = Matter.World;
+    const Bodies = Matter.Bodies;
+    const Body = Matter.Body;
+    const Mouse = Matter.Mouse;
+    const MouseConstraint = Matter.MouseConstraint;
+
+    const engine = Engine.create();
+    engine.gravity.y = 1.6;
+
+    const render = Render.create({
+      element: document.getElementById('physics-container'),
+      engine: engine,
+      options: {
+        width: 720,
+        height: 340,
+        wireframes: false,
+        background: 'transparent'
+      }
+    });
+
+    // Ground + Walls
+    const ground = Bodies.rectangle(360, 320, 800, 50, { isStatic: true, render: { fillStyle: 'transparent' } });
+    const leftWall = Bodies.rectangle(-10, 170, 40, 400, { isStatic: true, render: { visible: false }});
+    const rightWall = Bodies.rectangle(730, 170, 40, 400, { isStatic: true, render: { visible: false }});
+
+    World.add(engine.world, [ground, leftWall, rightWall]);
+
+    // Better shaped letters (thicker, more logo-like)
+    const n = Bodies.rectangle(200, 80, 95, 160, {
+      restitution: 0.65,
+      friction: 0.2,
+      chamfer: { radius: 12 },
+      render: { fillStyle: '#262626' }
+    });
+
+    const u = Bodies.rectangle(340, 80, 90, 160, {
+      restitution: 0.68,
+      friction: 0.2,
+      chamfer: { radius: 12 },
+      render: { fillStyle: '#262626' }
+    });
+
+    const e = Bodies.rectangle(480, 80, 95, 160, {
+      restitution: 0.65,
+      friction: 0.2,
+      chamfer: { radius: 12 },
+      render: { fillStyle: '#262626' }
+    });
+
+    World.add(engine.world, [n, u, e]);
+
+    // Add text labels on top (we'll improve with real SVG paths later)
+    function addLabel(body, text) {
+      const label = document.createElement('div');
+      label.style.position = 'absolute';
+      label.style.color = '#D4A373';
+      label.style.fontSize = '68px';
+      label.style.fontWeight = 'bold';
+      label.style.pointerEvents = 'none';
+      label.style.userSelect = 'none';
+      label.textContent = text;
+      document.getElementById('physics-container').appendChild(label);
+      
+      // Update position every frame
+      Matter.Events.on(engine, 'afterUpdate', () => {
+        const pos = body.position;
+        const angle = body.angle;
+        label.style.left = (pos.x - 32) + 'px';
+        label.style.top = (pos.y - 45) + 'px';
+        label.style.transform = `rotate(${angle * (180/Math.PI)}deg)`;
+      });
+    }
+
+    addLabel(n, 'N');
+    addLabel(u, 'U');
+    addLabel(e, 'E');
+
+    // Mouse / Touch dragging
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, {
+      mouse: mouse,
+      constraint: { stiffness: 0.9, render: { visible: false }}
+    });
+    World.add(engine.world, mouseConstraint);
+
+    Engine.run(engine);
+    Render.run(render);
+
+    // Double-click to reset
+    render.canvas.addEventListener('dblclick', () => {
+      [n, u, e].forEach(body => {
+        Body.setPosition(body, { x: 150 + Math.random() * 420, y: 40 + Math.random() * 60 });
+        Body.setVelocity(body, { x: (Math.random() - 0.5) * 10, y: -15 });
+        Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.4);
+      });
+    });
+
+    console.log("✅ Improved logo ready! Drag letters, double-click to reset.");
+  </script>
+</body>
+</html>
