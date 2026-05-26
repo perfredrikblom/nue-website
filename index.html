@@ -4,24 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUE - Canggu</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
   <style>
     body { margin: 0; background: #0A3D2B; overflow: hidden; }
-    .debug { position: fixed; top: 10px; left: 10px; color: white; z-index: 100; }
   </style>
 </head>
 <body>
-  <div class="debug">Testing PNG loading...</div>
 
   <script>
+    // Basic Matter.js setup
     const Engine = Matter.Engine;
     const Render = Matter.Render;
     const World = Matter.World;
     const Bodies = Matter.Bodies;
+    const Body = Matter.Body;
+    const MouseConstraint = Matter.MouseConstraint;
+    const Mouse = Matter.Mouse;
 
     const engine = Engine.create();
-    engine.gravity.y = 2.2;
+    engine.gravity.y = 2.3;
 
     const render = Render.create({
       element: document.body,
@@ -35,18 +36,20 @@
     });
 
     // Ground
-    const ground = Bodies.rectangle(window.innerWidth/2, window.innerHeight - 80, window.innerWidth*2, 160, {
+    const ground = Bodies.rectangle(window.innerWidth/2, window.innerHeight - 60, window.innerWidth*2, 120, {
       isStatic: true,
       render: { visible: false }
     });
+
     World.add(engine.world, ground);
 
-    // Test with one logo
+    // Your logo
     const logoBody = Bodies.rectangle(window.innerWidth/2, 150, 400, 160, {
       restitution: 0.5,
+      friction: 0.4,
       render: {
         sprite: {
-          texture: 'nue-logo.png',   // Make sure this name is exact
+          texture: 'nue-logo.png',
           xScale: 0.9,
           yScale: 0.9
         }
@@ -55,10 +58,24 @@
 
     World.add(engine.world, logoBody);
 
+    // Enable mouse drag
+    const mouse = Mouse.create(render.canvas);
+    const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
+    World.add(engine.world, mouseConstraint);
+
+    // Run physics
     Engine.run(engine);
     Render.run(render);
 
-    console.log("✅ Physics running. Check if nue-logo.png loads.");
+    // Click to give it a push
+    document.addEventListener('click', () => {
+      Body.applyForce(logoBody, logoBody.position, {
+        x: (Math.random() - 0.5) * 0.15,
+        y: -0.22
+      });
+    });
+
+    console.log("Physics initialized - try dragging the logo");
   </script>
 </body>
 </html>
