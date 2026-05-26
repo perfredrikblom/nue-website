@@ -22,16 +22,14 @@ const render = Render.create({
 });
 
 // Ground
-const ground = Bodies.rectangle(
-  window.innerWidth / 2, 
-  window.innerHeight - 40, 
-  window.innerWidth * 2, 
-  100, 
-  { isStatic: true, restitution: 0.65, render: { visible: false } }
-);
+const ground = Bodies.rectangle(window.innerWidth/2, window.innerHeight - 40, window.innerWidth*2, 100, {
+  isStatic: true,
+  restitution: 0.65,
+  render: { visible: false }
+});
 World.add(engine.world, ground);
 
-// Create the three letters
+// Letters
 const letters = [];
 
 const createLetter = (x, y, texture) => {
@@ -39,11 +37,7 @@ const createLetter = (x, y, texture) => {
     restitution: 0.62,
     friction: 0.3,
     render: {
-      sprite: {
-        texture: texture,
-        xScale: 1,
-        yScale: 1
-      }
+      sprite: { texture: texture, xScale: 1, yScale: 1 }
     }
   });
   letters.push(body);
@@ -62,23 +56,37 @@ World.add(engine.world, mouseConstraint);
 Engine.run(engine);
 Render.run(render);
 
-// Click anywhere to give all letters a push
-document.addEventListener('click', () => {
-  letters.forEach(letter => {
-    Body.applyForce(letter, letter.position, {
-      x: (Math.random() - 0.5) * 0.12,
-      y: -0.22
-    });
-    Body.setAngularVelocity(letter, (Math.random() - 0.5) * 0.4);
-  });
-});
-
 // Initial drop
 setTimeout(() => {
   letters.forEach((letter, i) => {
-    Body.setVelocity(letter, { 
-      x: (i - 1) * 2, 
-      y: 8 + Math.random() * 4 
-    });
+    Body.setVelocity(letter, { x: (i - 1) * 1.5, y: 7 + Math.random() * 3 });
   });
 }, 400);
+
+// Click / Tap → Only affect the CLOSEST letter
+document.addEventListener('click', (e) => {
+  const clickX = e.clientX;
+  const clickY = e.clientY;
+
+  let closest = null;
+  let minDistance = Infinity;
+
+  letters.forEach(letter => {
+    const dx = letter.position.x - clickX;
+    const dy = letter.position.y - clickY;
+    const distance = dx * dx + dy * dy;
+
+    if (distance < minDistance) {
+      minDistance = distance;
+      closest = letter;
+    }
+  });
+
+  if (closest) {
+    Body.applyForce(closest, closest.position, {
+      x: (Math.random() - 0.5) * 0.13,
+      y: -0.21
+    });
+    Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.45);
+  }
+});
