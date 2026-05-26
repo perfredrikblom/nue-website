@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUE - Canggu</title>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
   <style>
     body { margin: 0; background: #0A3D2B; overflow: hidden; }
@@ -12,17 +13,16 @@
 <body>
 
   <script>
-    // Basic Matter.js setup
     const Engine = Matter.Engine;
     const Render = Matter.Render;
     const World = Matter.World;
     const Bodies = Matter.Bodies;
     const Body = Matter.Body;
-    const MouseConstraint = Matter.MouseConstraint;
     const Mouse = Matter.Mouse;
+    const MouseConstraint = Matter.MouseConstraint;
 
     const engine = Engine.create();
-    engine.gravity.y = 2.3;
+    engine.gravity.y = 2.35;
 
     const render = Render.create({
       element: document.body,
@@ -40,42 +40,39 @@
       isStatic: true,
       render: { visible: false }
     });
-
     World.add(engine.world, ground);
 
-    // Your logo
-    const logoBody = Bodies.rectangle(window.innerWidth/2, 150, 400, 160, {
-      restitution: 0.5,
+    // Logo
+    const logoBody = Bodies.rectangle(window.innerWidth/2, 140, 420, 160, {
+      restitution: 0.48,
       friction: 0.4,
       render: {
         sprite: {
           texture: 'nue-logo.png',
-          xScale: 0.9,
-          yScale: 0.9
+          xScale: 0.92,
+          yScale: 0.92
         }
       }
     });
 
     World.add(engine.world, logoBody);
 
-    // Enable mouse drag
+    // Mouse drag
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
     World.add(engine.world, mouseConstraint);
 
-    // Run physics
     Engine.run(engine);
     Render.run(render);
 
-    // Click to give it a push
+    // Click anywhere = gentle push from current position
     document.addEventListener('click', () => {
       Body.applyForce(logoBody, logoBody.position, {
-        x: (Math.random() - 0.5) * 0.15,
-        y: -0.22
+        x: (Math.random() - 0.5) * 0.12,
+        y: -0.20
       });
+      Body.setAngularVelocity(logoBody, (Math.random() - 0.5) * 0.25);
     });
-
-    console.log("Physics initialized - try dragging the logo");
   </script>
 </body>
 </html>
