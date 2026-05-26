@@ -1,4 +1,6 @@
 // script.js
+const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint } = Matter;
+
 let engine, render, letters = [];
 
 function initPhysics() {
@@ -75,7 +77,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click → only push closest letter
+// Click → push closest
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
@@ -99,5 +101,5 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Resize
+// Resize support
 window.addEventListener('resize', initPhysics);
