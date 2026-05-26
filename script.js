@@ -6,7 +6,7 @@ function initPhysics() {
   if (engine) Engine.clear(engine);
 
   engine = Engine.create();
-  engine.gravity.y = 2.0;
+  engine.gravity.y = 2.05;
 
   render = Render.create({
     element: document.body,
@@ -19,24 +19,24 @@ function initPhysics() {
     }
   });
 
-  // Ground
+  // Ground at bottom
   ground = Bodies.rectangle(
     window.innerWidth / 2, 
-    window.innerHeight - 40, 
+    window.innerHeight - 45, 
     window.innerWidth * 2, 
     100, 
-    { isStatic: true, restitution: 0.65, render: { visible: false } }
+    { isStatic: true, restitution: 0.68, render: { visible: false } }
   );
   World.add(engine.world, ground);
 
   letters = [];
   const centerX = window.innerWidth / 2;
-  const scale = Math.min(1.0, window.innerWidth / 1400); // responsive scaling
+  const scale = Math.min(1.1, window.innerWidth / 1100);   // responsive scaling
 
   const createLetter = (offsetX, texture) => {
-    const body = Bodies.rectangle(centerX + offsetX, 140, 130 * scale, 180 * scale, {
-      restitution: 0.62,
-      friction: 0.3,
+    const body = Bodies.rectangle(centerX + offsetX * scale, 130, 130 * scale, 180 * scale, {
+      restitution: 0.65,
+      friction: 0.28,
       render: {
         sprite: {
           texture: texture,
@@ -49,11 +49,11 @@ function initPhysics() {
     World.add(engine.world, body);
   };
 
-  createLetter(-180 * scale, 'assets/n.png');
+  createLetter(-190, 'assets/n.png');
   createLetter(0, 'assets/u.png');
-  createLetter(180 * scale, 'assets/e.png');
+  createLetter(190, 'assets/e.png');
 
-  // Mouse drag
+  // Mouse / touch drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
@@ -62,20 +62,20 @@ function initPhysics() {
   Render.run(render);
 }
 
-// Initial setup
+// Start
 initPhysics();
 
-// Initial drop
+// Initial natural drop
 setTimeout(() => {
   letters.forEach((letter, i) => {
     Body.setVelocity(letter, { 
-      x: (i - 1) * 2.5, 
-      y: 9 
+      x: (i - 1) * 2.2, 
+      y: 7.5 
     });
   });
 }, 300);
 
-// Click → push closest
+// Click → push only closest letter
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
@@ -92,13 +92,12 @@ document.addEventListener('click', (e) => {
 
   if (closest) {
     Body.applyForce(closest, closest.position, {
-      x: (Math.random() - 0.5) * 0.13,
-      y: -0.22
+      x: (Math.random() - 0.5) * 0.14,
+      y: -0.23
     });
+    Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.4);
   }
 });
 
-// Resize handling
-window.addEventListener('resize', () => {
-  initPhysics();
-});
+// Resize support
+window.addEventListener('resize', initPhysics);
