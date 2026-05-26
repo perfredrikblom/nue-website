@@ -42,10 +42,10 @@
     });
     World.add(engine.world, ground);
 
-    // Single logo body
-    const logoBody = Bodies.rectangle(window.innerWidth/2, 120, 420, 160, {
-      restitution: 0.5,
-      friction: 0.4,
+    // Logo
+    const logoBody = Bodies.rectangle(window.innerWidth/2, 150, 420, 160, {
+      restitution: 0.52,
+      friction: 0.35,
       render: {
         sprite: {
           texture: 'nue-logo.png',
@@ -57,7 +57,7 @@
 
     World.add(engine.world, logoBody);
 
-    // Mouse drag
+    // Mouse drag support
     const mouse = Mouse.create(render.canvas);
     const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
     World.add(engine.world, mouseConstraint);
@@ -65,11 +65,19 @@
     Engine.run(engine);
     Render.run(render);
 
-    // Click to drop again
-    document.addEventListener('click', () => {
-      Body.setPosition(logoBody, { x: window.innerWidth/2, y: 100 });
-      Body.setVelocity(logoBody, { x: (Math.random() - 0.5) * 10, y: -14 });
-      Body.setAngularVelocity(logoBody, (Math.random() - 0.5) * 0.4);
+    // CLICK = Push from current position (no reset)
+    document.addEventListener('click', (e) => {
+      const forceMagnitude = 0.08;
+      const dx = (Math.random() - 0.5) * 12;   // random horizontal push
+      const dy = -14;                          // upward push
+
+      Body.applyForce(logoBody, logoBody.position, {
+        x: dx * forceMagnitude,
+        y: dy * forceMagnitude
+      });
+
+      // Add some spin for fun
+      Body.setAngularVelocity(logoBody, (Math.random() - 0.5) * 0.25);
     });
   </script>
 </body>
