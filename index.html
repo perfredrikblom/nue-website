@@ -22,7 +22,7 @@
     const MouseConstraint = Matter.MouseConstraint;
 
     const engine = Engine.create();
-    engine.gravity.y = 2.6;   // stronger gravity
+    engine.gravity.y = 2.8;   // Stronger gravity
 
     const render = Render.create({
       element: document.body,
@@ -35,24 +35,24 @@
       }
     });
 
-    // Lower and more solid ground
+    // Ground exactly at window bottom
     const ground = Bodies.rectangle(
-      window.innerWidth/2, 
-      window.innerHeight - 40, 
+      window.innerWidth / 2, 
+      window.innerHeight - 30, 
       window.innerWidth * 2, 
-      100, 
+      80, 
       { 
         isStatic: true,
-        restitution: 0.6,
+        restitution: 0.65,     // Good bounce
         render: { visible: false }
       }
     );
     World.add(engine.world, ground);
 
     // Logo
-    const logoBody = Bodies.rectangle(window.innerWidth/2, 120, 420, 160, {
-      restitution: 0.65,     // increased bounce
-      friction: 0.3,
+    const logoBody = Bodies.rectangle(window.innerWidth / 2, 100, 420, 160, {
+      restitution: 0.68,
+      friction: 0.25,
       render: {
         sprite: {
           texture: 'nue-logo.png',
@@ -72,18 +72,19 @@
     Engine.run(engine);
     Render.run(render);
 
-    // Initial drop with extra downward velocity
+    // Stronger initial drop
     setTimeout(() => {
-      Body.setVelocity(logoBody, { x: 0, y: 8 });
-    }, 200);
+      Body.setPosition(logoBody, { x: window.innerWidth / 2, y: 80 });
+      Body.setVelocity(logoBody, { x: (Math.random() - 0.5) * 3, y: 12 });
+    }, 150);
 
-    // Click = push from current position
+    // Click to push from current position
     document.addEventListener('click', () => {
       Body.applyForce(logoBody, logoBody.position, {
-        x: (Math.random() - 0.5) * 0.13,
-        y: -0.22
+        x: (Math.random() - 0.5) * 0.14,
+        y: -0.24
       });
-      Body.setAngularVelocity(logoBody, (Math.random() - 0.5) * 0.3);
+      Body.setAngularVelocity(logoBody, (Math.random() - 0.5) * 0.35);
     });
   </script>
 </body>
