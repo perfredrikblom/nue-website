@@ -5,102 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUE - Canggu</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
   <style>
     body { font-family: system-ui, sans-serif; }
-    #physics-container { 
-      width: 100%; 
-      max-width: 760px; 
-      height: 420px; 
-      margin: 0 auto; 
-      background: rgba(10, 61, 43, 0.7); 
-      border-radius: 28px;
-      overflow: hidden;
-      position: relative;
-    }
   </style>
 </head>
 <body class="bg-[#0A3D2B] text-white min-h-screen">
 
-  <div class="min-h-screen flex flex-col items-center justify-center p-6">
-    <div class="mb-8 text-center">
-      <p class="text-[#D4A373] text-xl">Modern Tropical Cuisine • Canggu, Bali</p>
+  <!-- Hero -->
+  <div class="min-h-screen flex flex-col items-center justify-center p-6 text-center">
+    
+    <!-- Your Real Logo -->
+    <div class="mb-12 w-full max-w-md">
+      <?xml version="1.0" encoding="UTF-8"?>
+      <svg id="Layer_6" data-name="Layer 6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384.43 133.4" class="w-full h-auto">
+        <defs>
+          <style>
+            .cls-1 { fill: #262626; }
+          </style>
+        </defs>
+        <path class="cls-1" d="m18.02,125.29c-4.18,1.06-8.72-2.73-9.69-12.72-1.13-15.11,4.31-30.2,11.61-42.51,9.68-16.82,25.49-32.7,45.39-32.29,14.77.21,27.75,11.02,33.65,24.85,5.79,13.17,4.23,28.73.11,41.85-2.51,8.19-5.95,15.94-9.84,23.47-.24.51-.81,1.47-1.42,1.16s-.26-1.39-.03-1.89l.62-1.55c6.97-18.55,13.48-40.95,4.29-59.78-3.63-7.03-9.46-13.08-16.56-16.04-15.97-6.55-30.52,6.17-39.51,19.56-6.49,9.66-11.43,18.73-13.71,29.45-1.08,4.73-1.61,12.1-.91,16.85,1.21,8.25-4,9.61-4,9.61,0,0,3.14-.79,0,0Z"/>
+        <path class="cls-1" d="m.91.17c11.45,13,23.1,25.14,36.09,36.28,3.78,2.9,5.72,6.8,5.69,12.12,0,0-.6.87-.6.87-3.6,1.13-6.59.89-9.58-.66-2.41-1.37-4.27-3.51-6.36-5.33-4.01-3.85-7.8-7.99-11.2-12.48C8.18,22.03,2.58,11.85.01.68c0,0-.1-.42.25-.6.41-.21.65.09.65.09h0Z"/>
+        <path class="cls-1" d="m133.46,25.72c2.13,4.03,5.61,10.65,8.15,15.16,6.09,10.84,12.66,21.42,19.98,31.45,5.83,8.28,15,19.23,25.33,18.18,14.29-1.75,25.61-19.16,32.73-30.85,8.56-14.32,15.79-29.67,23.47-44.76,0,0,.17-.46.68-.29.45.15.25.67.25.67-9.55,27.06-31.34,100.31-71.19,82.56-8.74-4.26-14.69-11.24-20.38-18.64-7.92-10.23-14.99-21.16-21.39-32.35-2.64-4.63-5.21-9.39-7.7-14.1-2.27-4.28-3.09-9.14,1.21-11.12,3.54-1.63,6.74.06,8.87,4.09Z"/>
+        <path class="cls-1" d="m211.57,81.6c3.35-5.86,5.53-4.24,10.62-2.88,3.3.94,6.59,2.46,9.63,4.09,5.3,3.08,9.88,7.48,13.36,12.5,7.63,11.63,11.52,24.35,15.74,37.31,0,0,.23.55-.16.73s-.73-.26-.73-.26c-3.95-4.94-7.43-10.19-10.83-15.39-5.07-7.59-9.33-15.03-16.07-20.84-.43-.42-1.06-.94-1.55-1.27-.94-.71-2.28-1.67-3.31-2.19-2.25-1.41-4.82-2.45-7.33-3.29-1.96-.72-4-1.18-6.06-1.65-.71-.12-1.35-.55-1.92-1.45-.58-.91-1.11-2.14-1.54-4.42l.15-.99h0Z"/>
+        <path class="cls-1" d="m363.74,88.39c-3.69-3.83-7.72-7.66-12.22-10.43-8.73-5.93-19-7.34-28.71-3.74-9.58,3.22-15.43,12.71-15.95,22.93-.25,5.07.74,10.28,3.42,14.56,4.83,7.24,13.44,11.64,22.04,12.16,14.98,1.11,28.71-8.57,35.89-21.8.4-.73,1.36-.23,1,.45-5.66,15.33-20.56,26.64-37.04,26.62-10.52.04-21.34-4.71-27.72-13.41-6.32-9.15-7.09-21.39-3.24-31.69,8.48-22.72,36.98-27.56,55.89-15.08,5.29,3.45,10.38,7.18,14.29,12.06,4.78,5.96-2.69,12.52-7.64,7.38Z"/>
+        <path class="cls-1" d="m306.53,77.72c-2.7,2.41-4.93,3.59-7.77,2.68-1.61-.97-2.89-2.39-4.21-3.74-3.86-4.2-6.71-9.64-7.85-15.34-2.24-11.94.92-24.58,9.27-32.71,12.64-12.3,32.14-17.13,51.89-17.8,12.06-.46,23.99-.03,35.99.85.65.04.62.81.04.79-13.48-.58-29.27.43-40.82,2.58-18.13,3.42-27.36,5.85-38.43,18.34-6.93,7.81-7.56,24.93.38,33.39,0,0,1.17,1.17,1.17,1.17.35.31.98.72,1.2,1.18.32.51.43,1.31.38,2.5-.08,1.24-.19,2.65-.71,5.12l-.53.97h0Z"/>
+      </svg>
     </div>
 
-    <div id="physics-container"></div>
+    <h1 class="text-5xl md:text-6xl font-light tracking-widest mb-3">NUE</h1>
+    <p class="text-[#D4A373] text-xl md:text-2xl">Modern Tropical Cuisine • Canggu, Bali</p>
 
-    <div class="flex flex-col sm:flex-row gap-4 mt-12">
-      <a href="https://octotable.com/book/restaurant/1000969/booking/new" target="_blank"
-         class="bg-white text-black px-10 py-4 rounded-full text-lg font-medium hover:bg-[#D4A373]">
+    <div class="flex flex-col sm:flex-row gap-4 mt-16">
+      <a href="https://octotable.com/book/restaurant/1000969/booking/new" 
+         target="_blank"
+         class="bg-white text-black px-10 py-4 rounded-full text-lg font-medium hover:bg-[#D4A373] transition">
         Reserve a Table
       </a>
-      <a href="#menu" class="border border-white/70 px-10 py-4 rounded-full text-lg font-medium hover:bg-white/10">
+      <a href="#menu" 
+         class="border border-white/70 px-10 py-4 rounded-full text-lg font-medium hover:bg-white/10 transition">
         View Menu
       </a>
     </div>
   </div>
 
-  <script>
-    const Engine = Matter.Engine;
-    const Render = Matter.Render;
-    const World = Matter.World;
-    const Bodies = Matter.Bodies;
-    const Body = Matter.Body;
-    const Mouse = Matter.Mouse;
-    const MouseConstraint = Matter.MouseConstraint;
-
-    const engine = Engine.create();
-    engine.gravity.y = 1.65;
-
-    const render = Render.create({
-      element: document.getElementById('physics-container'),
-      engine: engine,
-      options: { 
-        width: 760, 
-        height: 420, 
-        wireframes: false, 
-        background: 'transparent' 
-      }
-    });
-
-    // Boundaries
-    World.add(engine.world, [
-      Bodies.rectangle(380, 400, 1000, 60, { isStatic: true, render: { visible: false }}),
-      Bodies.rectangle(-30, 210, 60, 500, { isStatic: true, render: { visible: false }}),
-      Bodies.rectangle(790, 210, 60, 500, { isStatic: true, render: { visible: false }})
-    ]);
-
-    // Physics bodies (invisible - only for interaction)
-    const nBody = Bodies.rectangle(210, 130, 120, 170, { restitution: 0.6, friction: 0.2, render: { visible: false } });
-    const uBody = Bodies.rectangle(370, 130, 110, 170, { restitution: 0.65, friction: 0.2, render: { visible: false } });
-    const eBody = Bodies.rectangle(530, 130, 120, 170, { restitution: 0.6, friction: 0.2, render: { visible: false } });
-
-    World.add(engine.world, [nBody, uBody, eBody]);
-
-    // Create SVG overlays - larger and better positioned
-    function createLetter(body, pathData, offsetX = 0, offsetY = 0) {
-      const div = document.createElement('div');
-      div.style.position = 'absolute';
-      div.style.width = '140px';
-      div.style.height = '190px';
-      div.innerHTML = `
-        <svg width="140" height="190" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-          <path fill="#262626" d="${pathData}"/>
-        </svg>`;
-      document.getElementById('physics-container').appendChild(div);
-
-      Matter.Events.on(engine, 'afterUpdate', () => {
-        const pos = body.position;
-        const angle = body.angle * (180 / Math.PI);
-        div.style.left = `${pos.x - 70 + offsetX}px`;
-        div.style.top = `${pos.y - 95 + offsetY}px`;
-        div.style.transform = `rotate(${angle}deg)`;
-      });
-    }
-
-    // Your paths (scaled better)
-    createLetter(nBody, "m28.19,190.98c-2.92.74-6.1-1.91-6.78-8.9-.79-10.57,3.01-21.13,8.12-29.73,6.77-11.76,17.83-22.87,31.75-22.59,10.33.15,19.41,7.71,23.54,17.38,4.05,9.21,2.96,20.1.07,29.27-1.75,5.73-4.16,11.15-6.88,16.41-.17.36-.56,1.03-1,.81s-.18-.97-.02-1.33l.43-1.09c4.88-12.98,9.43-28.64,3-41.81-2.54-4.92-6.61-9.15-11.58-11.22-11.17-4.58-21.35,4.31-27.64,13.68-4.54,6.76-7.99,13.1-9.59,20.6-.76,3.31-1.12,8.46-.64,11.79.85,5.77-2.8,6.72-2.8,6.72,0,0,2.2-.56,0,0Z", -5, 5);
-
-    createLetter(uBody, "m108.94,121.33c1.49,2.82,3.92,7.45,5.7,10.6,4.26,7.58,8.85,14.98,13.98,22,4.08,5.79,10.49,13.45,17.71,12.72,10-1.23,17.91-13.4,22.9-21.58,5.99-10.02,11.05-20.75,16.41-31.31,0,0,.12-.32.47-.2.31.11.17.47.17.47-6.68,18.93-21.92,70.16-49.8,57.74-6.11-2.98-10.27-7.86-14.26-13.04-5.54-7.15-10.48-14.8-14.96-22.63-1.85-3.24-3.64-6.57-5.39-9.86-1.59-2.99-2.16-6.39.85-7.78,2.47-1.14,4.71.04,6.21,2.86Z", 0, 0);
-
-    createLetter(eBody, "m270,165.17c-2.58-2.68-5.4-5.35-8.55-7.3-6.11-4.15-13.29-5.13-20.08-2.61-6.7,2.25-10.79,8.89-11.15,16.04-.17,3.55.52,7.19,2.39,10.19,3.38,5.06,9.4,8.14,15.41,8.51,10.48.78,20.08-5.99,25.1-15.25.28-.51.95-.16.7.32-3.96,10.72-14.38,18.63-25.91,18.62-7.36.03-14.
+</body>
+</html>
