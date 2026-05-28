@@ -21,7 +21,8 @@ function initPhysics() {
     }
   });
 
-  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 45, window.innerWidth * 2, 100, {
+  // Physics ground - slightly above the visual buttons
+  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 110, window.innerWidth * 2, 60, {
     isStatic: true,
     restitution: 0.65,
     render: { visible: false }
@@ -40,18 +41,13 @@ function initPhysics() {
       frictionAir: 0.018,
       angle: rotation,
       render: {
-        sprite: {
-          texture: texture,
-          xScale: scale,
-          yScale: scale
-        }
+        sprite: { texture: texture, xScale: scale, yScale: scale }
       }
     });
     letters.push(body);
     World.add(engine.world, body);
   };
 
-  // Adjust these values:
   createLetter(-spacing, 'assets/n.png', -0.25);
   createLetter(0,        'assets/u.png',  0.00);
   createLetter(spacing,  'assets/e.png', -0.20);
@@ -60,7 +56,6 @@ function initPhysics() {
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
 
-  // Modern way - no deprecation warning
   Runner.run(engine);
   Render.run(render);
 }
@@ -70,14 +65,11 @@ initPhysics();
 // Initial drop
 setTimeout(() => {
   letters.forEach((letter, i) => {
-    Body.setVelocity(letter, { 
-      x: (i - 1) * 0.4, 
-      y: 9.2 
-    });
+    Body.setVelocity(letter, { x: (i - 1) * 0.4, y: 9.2 });
   });
 }, 200);
 
-// Click → push closest
+// Click push
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
@@ -93,10 +85,7 @@ document.addEventListener('click', (e) => {
   });
 
   if (closest) {
-    Body.applyForce(closest, closest.position, {
-      x: (Math.random() - 0.5) * 0.13,
-      y: -0.23
-    });
+    Body.applyForce(closest, closest.position, { x: (Math.random() - 0.5) * 0.13, y: -0.23 });
   }
 });
 
