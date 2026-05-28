@@ -24,13 +24,17 @@ function initPhysics() {
   buttonBodies = [];
   const baseY = window.innerHeight - 85;
 
-  const createButton = (baseX, text, width, height, id) => {
-    // Random variation on every load
-    const x = baseX + (Math.random() - 0.5) * 70;
-    const y = baseY + (Math.random() - 0.5) * 25;
-    const rotation = (Math.random() - 0.5) * 0.18;
+  const createButton = (baseX, text, baseWidth, baseHeight, id) => {
+    // Strong random variation on every load
+    const xOffset = (Math.random() - 0.5) * 90;
+    const yOffset = (Math.random() - 0.5) * 35;
+    const rotation = (Math.random() - 0.5) * 0.28;        // more rotation
+    const width = baseWidth * (0.75 + Math.random() * 0.55);
+    const height = baseHeight * (0.8 + Math.random() * 0.5);
+    const fontSize = 1.05 + Math.random() * 0.65;
+    const wdth = 60 + Math.random() * 70;                 // strong condensation/expansion
 
-    const body = Bodies.rectangle(x, y, width, height, {
+    const body = Bodies.rectangle(baseX + xOffset, baseY + yOffset, width, height, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -44,16 +48,18 @@ function initPhysics() {
     btn.id = id;
     btn.className = 'physics-button';
     btn.textContent = text;
-    btn.style.left = (x - width/2) + 'px';
-    btn.style.top = (y - height/2) + 'px';
+    btn.style.left = (baseX + xOffset - width/2) + 'px';
+    btn.style.top = (baseY + yOffset - height/2) + 'px';
     btn.style.width = width + 'px';
+    btn.style.fontSize = fontSize + 'rem';
+    btn.style.fontVariationSettings = `"wdth" ${wdth}, "wght" ${600 + Math.random()*300}`;
     btn.style.transform = `rotate(${rotation * 18}deg)`;
     document.body.appendChild(btn);
 
     return { body, element: btn };
   };
 
-  // Buttons with variation
+  // Create buttons with strong personality
   const tableBtn = createButton(window.innerWidth * 0.16, "TABLE", 195, 72, 'btn-table');
   tableBtn.element.onclick = () => window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
 
@@ -64,7 +70,7 @@ function initPhysics() {
   socialBtn.element.onclick = () => window.open('https://instagram.com/nue.bali', '_blank');
 
   const menuBtn = createButton(window.innerWidth * 0.85, "MENU", 160, 52, 'btn-menu');
-  menuBtn.element.onclick = () => window.open('#', '_blank'); // Update later
+  menuBtn.element.onclick = () => window.open('#', '_blank');
 
   // Letters
   letters = [];
@@ -107,7 +113,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click → push closest
+// Click push closest
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
