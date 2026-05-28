@@ -21,38 +21,37 @@ function initPhysics() {
     }
   });
 
-  // Create physics buttons (different sizes)
   buttonBodies = [];
 
-  const createButton = (x, y, width, height, text, color = '#ffffff') => {
+  const createButton = (x, y, width, height, id, text) => {
     const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
-      restitution: 0.7,
+      restitution: 0.68,
       friction: 0.4,
       render: { visible: false }
     });
     World.add(engine.world, body);
     buttonBodies.push(body);
 
-    // Visual button
+    // Visual text-only button
     const btn = document.createElement('button');
-    btn.className = 'button';
+    btn.id = id;
+    btn.className = 'physics-button';
     btn.textContent = text;
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
-    btn.style.background = color;
     document.body.appendChild(btn);
 
     return body;
   };
 
-  const centerY = window.innerHeight - 90;
+  const baseY = window.innerHeight - 85;
 
-  createButton(window.innerWidth * 0.18, centerY, 260, 158, "Reserve", "#D4A373");
-  createButton(window.innerWidth * 0.42, centerY, 130, 52, "Menu");
-  createButton(window.innerWidth * 0.65, centerY, 180, 62, "About NUE");
-  createButton(window.innerWidth * 0.88, centerY, 110, 48, "Contact");
+  createButton(window.innerWidth * 0.16, baseY, 180, 60, 'btn-reserve', "RESERVE TABLE");
+  createButton(window.innerWidth * 0.42, baseY, 110, 52, 'btn-menu',    "MENU");
+  createButton(window.innerWidth * 0.68, baseY, 170, 58, 'btn-about',   "ABOUT NUE");
+  createButton(window.innerWidth * 0.89, baseY, 120, 48, 'btn-contact', "CONTACT");
 
   // Letters
   letters = [];
@@ -78,7 +77,6 @@ function initPhysics() {
   createLetter(0,        'assets/u.png',  0.00);
   createLetter(spacing,  'assets/e.png', -0.20);
 
-  // Mouse drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
@@ -96,7 +94,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push closest letter
+// Click push closest
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
