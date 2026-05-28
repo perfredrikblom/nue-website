@@ -22,36 +22,42 @@ function initPhysics() {
   });
 
   buttonBodies = [];
+  const baseY = window.innerHeight - 70;
 
-  const createButton = (x, y, width, height, id, text) => {
+  // Random but controlled button creation
+  const createButton = (baseX, text, width, height, rotation = 0, fontSize = 1.1) => {
+    const x = baseX + (Math.random() - 0.5) * 60; // small random horizontal variation
+    const y = baseY - (height / 2) + (Math.random() - 0.5) * 20; // vertical variation
+
     const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
+      angle: rotation,
       render: { visible: false }
     });
     World.add(engine.world, body);
     buttonBodies.push(body);
 
-    // Visual text-only button
+    // Visual button (text only)
     const btn = document.createElement('button');
-    btn.id = id;
     btn.className = 'physics-button';
     btn.textContent = text;
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
+    btn.style.fontSize = fontSize + 'rem';
+    btn.style.transform = `rotate(${rotation * 15}deg)`;
     document.body.appendChild(btn);
 
     return body;
   };
 
-  const baseY = window.innerHeight - 85;
-
-  createButton(window.innerWidth * 0.16, baseY, 180, 60, 'btn-reserve', "RESERVE TABLE");
-  createButton(window.innerWidth * 0.42, baseY, 110, 52, 'btn-menu',    "MENU");
-  createButton(window.innerWidth * 0.68, baseY, 170, 58, 'btn-about',   "ABOUT NUE");
-  createButton(window.innerWidth * 0.89, baseY, 120, 48, 'btn-contact', "CONTACT");
+  // Create buttons with big variation
+  createButton(window.innerWidth * 0.18, "RESERVE", 190, 68, -0.08, 1.45);
+  createButton(window.innerWidth * 0.40, "MENU",     125, 52,  0.12, 1.10);
+  createButton(window.innerWidth * 0.62, "ABOUT",    165, 74, -0.05, 1.38);
+  createButton(window.innerWidth * 0.85, "CONTACT",  135, 48,  0.09, 1.05);
 
   // Letters
   letters = [];
