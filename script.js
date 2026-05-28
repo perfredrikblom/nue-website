@@ -22,27 +22,27 @@ function initPhysics() {
   });
 
   // Ground
-  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 45, window.innerWidth * 2, 100, {
-    isStatic: true,
-    restitution: 0.68,
-    render: { visible: false }
-  });
+  const ground = Bodies.rectangle(
+    window.innerWidth / 2, 
+    window.innerHeight - 45, 
+    window.innerWidth * 2, 
+    100, 
+    { isStatic: true, restitution: 0.68, render: { visible: false } }
+  );
   World.add(engine.world, ground);
 
   letters = [];
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
 
-  // ================== CONTROLS ==================
-  const spacing = 195 * scale;           // ← Change this to control horizontal spacing
-  const startHeight = 130;               // ← Vertical starting height
-  // =============================================
+  const spacing = 195 * scale;        // ← Horizontal spacing between letters
+  const startHeight = 130;            // ← Starting height
 
   const createLetter = (offset, texture, initialRotation = 0) => {
     const body = Bodies.rectangle(centerX + offset, startHeight, 135 * scale, 185 * scale, {
       restitution: 0.66,
       friction: 0.32,
-      angle: initialRotation,               // Initial rotation in radians
+      angle: initialRotation,
       render: {
         sprite: {
           texture: texture,
@@ -56,10 +56,9 @@ function initPhysics() {
     return body;
   };
 
-  // Create letters with individual starting rotation
-  createLetter(-spacing, 'assets/n.png', -0.15);   // N slightly rotated left
-  createLetter(0,        'assets/u.png',  0.08);   // U slightly rotated right
-  createLetter(spacing,  'assets/e.png', -0.10);   // E slightly rotated left
+  createLetter(-spacing, 'assets/n.png', -0.15);
+  createLetter(0,        'assets/u.png',  0.08);
+  createLetter(spacing,  'assets/e.png', -0.10);
 
   // Mouse drag
   const mouse = Mouse.create(render.canvas);
@@ -83,9 +82,29 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click → push closest
+// Click → push closest letter
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
 
-  letters.forEach
+  letters.forEach(letter => {
+    const dx = letter.position.x - e.clientX;
+    const dy = letter.position.y - e.clientY;
+    const dist = dx*dx + dy*dy;
+    if (dist < minDist) {
+      minDist = dist;
+      closest = letter;
+    }
+  });
+
+  if (closest) {
+    Body.applyForce(closest, closest.position, {
+      x: (Math.random() - 0.5) * 0.14,
+      y: -0.24
+    });
+    Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.4);
+  }
+});
+
+// Resize
+window.addEventListener('resize', initPhysics);
