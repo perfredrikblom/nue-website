@@ -52,9 +52,9 @@ function initPhysics() {
   };
 
   // Adjust these values freely:
-  createLetter(-240 * scale, 140, 'assets/n.png', -0.18);   // N: x offset, y, rotation
-  createLetter(   0 * scale, 110, 'assets/u.png',  0.06);   // U
-  createLetter( 240 * scale, 155, 'assets/e.png', -0.12);   // E
+  createLetter(-240 * scale, 140, 'assets/n.png', -1.00);   // N: x offset, y, rotation
+  createLetter(   0 * scale, 110, 'assets/u.png',  0.00);   // U
+  createLetter( 240 * scale, 155, 'assets/e.png', -0.50);   // E
 
   // Mouse drag
   const mouse = Mouse.create(render.canvas);
