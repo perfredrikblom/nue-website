@@ -35,7 +35,7 @@ function initPhysics() {
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
 
-  const spacing = 295 * scale;        // ← Horizontal spacing between letters
+  const spacing = 395 * scale;        // ← Horizontal spacing between letters
   const startHeight = 130;            // ← Starting height
 
   const createLetter = (offset, texture, initialRotation = 0) => {
