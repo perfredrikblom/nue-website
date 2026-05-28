@@ -1,7 +1,7 @@
 // script.js
 const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Runner } = Matter;
 
-let engine, render, letters = [];
+let engine, render, letters = [], buttonBodies = [];
 
 function initPhysics() {
   if (render) Render.stop(render);
@@ -21,14 +21,40 @@ function initPhysics() {
     }
   });
 
-  // Physics ground - slightly above the visual buttons
-  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 110, window.innerWidth * 2, 60, {
-    isStatic: true,
-    restitution: 0.65,
-    render: { visible: false }
-  });
-  World.add(engine.world, ground);
+  // Create physics buttons (different sizes)
+  buttonBodies = [];
 
+  const createButton = (x, y, width, height, text, color = '#ffffff') => {
+    const body = Bodies.rectangle(x, y, width, height, {
+      isStatic: true,
+      restitution: 0.7,
+      friction: 0.4,
+      render: { visible: false }
+    });
+    World.add(engine.world, body);
+    buttonBodies.push(body);
+
+    // Visual button
+    const btn = document.createElement('button');
+    btn.className = 'button';
+    btn.textContent = text;
+    btn.style.left = (x - width/2) + 'px';
+    btn.style.top = (y - height/2) + 'px';
+    btn.style.width = width + 'px';
+    btn.style.background = color;
+    document.body.appendChild(btn);
+
+    return body;
+  };
+
+  const centerY = window.innerHeight - 90;
+
+  createButton(window.innerWidth * 0.18, centerY, 160, 58, "Reserve", "#D4A373");
+  createButton(window.innerWidth * 0.42, centerY, 130, 52, "Menu");
+  createButton(window.innerWidth * 0.65, centerY, 180, 62, "About NUE");
+  createButton(window.innerWidth * 0.88, centerY, 110, 48, "Contact");
+
+  // Letters
   letters = [];
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
@@ -52,6 +78,7 @@ function initPhysics() {
   createLetter(0,        'assets/u.png',  0.00);
   createLetter(spacing,  'assets/e.png', -0.20);
 
+  // Mouse drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
@@ -69,7 +96,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push
+// Click push closest letter
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
@@ -85,7 +112,10 @@ document.addEventListener('click', (e) => {
   });
 
   if (closest) {
-    Body.applyForce(closest, closest.position, { x: (Math.random() - 0.5) * 0.13, y: -0.23 });
+    Body.applyForce(closest, closest.position, {
+      x: (Math.random() - 0.5) * 0.13,
+      y: -0.23
+    });
   }
 });
 
