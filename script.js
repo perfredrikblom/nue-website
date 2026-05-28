@@ -36,7 +36,7 @@ function initPhysics() {
   const scale = Math.min(1.05, window.innerWidth / 1200);
 
   const spacing = 295 * scale;        // ← Horizontal spacing between letters
-  const startHeight = 0;            // ← Starting height
+  const startHeight = -20;            // ← Starting height
 
   const createLetter = (offset, texture, initialRotation = 0) => {
     const body = Bodies.rectangle(centerX + offset, startHeight, 135 * scale, 185 * scale, {
