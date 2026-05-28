@@ -8,7 +8,7 @@ function initPhysics() {
   if (engine) Engine.clear(engine);
 
   engine = Engine.create();
-  engine.gravity.y = 2.05;
+  engine.gravity.y = 2.1;
 
   render = Render.create({
     element: document.body,
@@ -22,26 +22,25 @@ function initPhysics() {
   });
 
   // Ground
-  const ground = Bodies.rectangle(
-    window.innerWidth / 2, 
-    window.innerHeight - 45, 
-    window.innerWidth * 2, 
-    100, 
-    { isStatic: true, restitution: 0.68, render: { visible: false } }
-  );
+  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 45, window.innerWidth * 2, 100, {
+    isStatic: true,
+    restitution: 0.65,
+    render: { visible: false }
+  });
   World.add(engine.world, ground);
 
   letters = [];
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
 
-  const spacing = 295 * scale;        // ← Horizontal spacing between letters
-  const startHeight = -100;            // ← Starting height
+  const spacing = 220 * scale;      // Increased spacing to reduce interaction
+  const startHeight = 130;
 
   const createLetter = (offset, texture, initialRotation = 0) => {
     const body = Bodies.rectangle(centerX + offset, startHeight, 135 * scale, 185 * scale, {
-      restitution: 0.66,
-      friction: 0.32,
+      restitution: 0.58,           // Slightly less bouncy
+      friction: 0.4,               // More friction
+      frictionAir: 0.015,          // Air resistance → straighter fall
       angle: initialRotation,
       render: {
         sprite: {
@@ -56,9 +55,9 @@ function initPhysics() {
     return body;
   };
 
-  createLetter(-spacing, 'assets/n.png', -0.15);
-  createLetter(0,        'assets/u.png',  0.08);
-  createLetter(spacing,  'assets/e.png', -0.10);
+  createLetter(-spacing, 'assets/n.png', -0.12);
+  createLetter(0,        'assets/u.png',  0.05);
+  createLetter(spacing,  'assets/e.png', -0.08);
 
   // Mouse drag
   const mouse = Mouse.create(render.canvas);
@@ -72,17 +71,17 @@ function initPhysics() {
 // Initialize
 initPhysics();
 
-// Initial drop
+// Initial drop - much straighter down
 setTimeout(() => {
   letters.forEach((letter, i) => {
     Body.setVelocity(letter, { 
-      x: (i - 1) * 2.8, 
-      y: 8.5 
+      x: (i - 1) * 0.8,     // Reduced horizontal velocity
+      y: 9.5 
     });
   });
 }, 200);
 
-// Click → push closest letter
+// Click → push closest
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
@@ -99,10 +98,10 @@ document.addEventListener('click', (e) => {
 
   if (closest) {
     Body.applyForce(closest, closest.position, {
-      x: (Math.random() - 0.5) * 0.14,
-      y: -0.24
+      x: (Math.random() - 0.5) * 0.12,
+      y: -0.22
     });
-    Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.4);
+    Body.setAngularVelocity(closest, (Math.random() - 0.5) * 0.35);
   }
 });
 
