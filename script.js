@@ -49,7 +49,7 @@ function initPhysics() {
 
   const centerY = window.innerHeight - 90;
 
-  createButton(window.innerWidth * 0.18, centerY, 160, 58, "Reserve", "#D4A373");
+  createButton(window.innerWidth * 0.18, centerY, 160, 158, "Reserve", "#D4A373");
   createButton(window.innerWidth * 0.42, centerY, 130, 52, "Menu");
   createButton(window.innerWidth * 0.65, centerY, 180, 62, "About NUE");
   createButton(window.innerWidth * 0.88, centerY, 110, 48, "Contact");
