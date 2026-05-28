@@ -22,13 +22,9 @@ function initPhysics() {
   });
 
   buttonBodies = [];
-  const baseY = window.innerHeight - 70;
+  const baseY = window.innerHeight - 85;
 
-  // Random but controlled button creation
-  const createButton = (baseX, text, width, height, rotation = 0, fontSize = 1.1) => {
-    const x = baseX + (Math.random() - 0.5) * 60; // small random horizontal variation
-    const y = baseY - (height / 2) + (Math.random() - 0.5) * 20; // vertical variation
-
+  const createButton = (x, y, width, height, id, text, rotation = 0) => {
     const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
       restitution: 0.68,
@@ -39,25 +35,30 @@ function initPhysics() {
     World.add(engine.world, body);
     buttonBodies.push(body);
 
-    // Visual button (text only)
     const btn = document.createElement('button');
+    btn.id = id;
     btn.className = 'physics-button';
     btn.textContent = text;
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
-    btn.style.fontSize = fontSize + 'rem';
-    btn.style.transform = `rotate(${rotation * 15}deg)`;
     document.body.appendChild(btn);
 
-    return body;
+    return { body, element: btn };
   };
 
-  // Create buttons with big variation
-  createButton(window.innerWidth * 0.18, "RESERVE", 190, 68, -0.08, 1.45);
-  createButton(window.innerWidth * 0.40, "MENU",     125, 52,  0.12, 1.10);
-  createButton(window.innerWidth * 0.62, "ABOUT",    165, 74, -0.05, 1.38);
-  createButton(window.innerWidth * 0.85, "CONTACT",  135, 48,  0.09, 1.05);
+  // Create buttons with different sizes, positions and slight rotation
+  const tableBtn = createButton(window.innerWidth * 0.16, baseY - 8, 195, 72, 'btn-table', "TABLE", -0.06);
+  tableBtn.element.onclick = () => window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
+
+  const venueBtn = createButton(window.innerWidth * 0.39, baseY - 15, 145, 55, 'btn-venue', "VENUE", 0.09);
+  venueBtn.element.onclick = () => window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
+
+  const socialBtn = createButton(window.innerWidth * 0.62, baseY - 5, 155, 65, 'btn-social', "SOCIAL", -0.04);
+  socialBtn.element.onclick = () => window.open('https://instagram.com/nue.bali', '_blank');
+
+  const menuBtn = createButton(window.innerWidth * 0.85, baseY - 12, 160, 52, 'btn-menu', "MENU", 0.07);
+  menuBtn.element.onclick = () => window.open('#', '_blank'); // Update when you have menu link
 
   // Letters
   letters = [];
@@ -100,7 +101,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push closest
+// Click → push closest letter
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
