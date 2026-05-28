@@ -31,14 +31,14 @@ function initPhysics() {
   letters = [];
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
+  const spacing = 280 * scale;
 
-  // ================== FULL CONTROL ==================
-  const createLetter = (xOffset, yStart, texture, rotation = 0) => {
-    const body = Bodies.rectangle(centerX + xOffset, yStart, 135 * scale, 185 * scale, {
+  const createLetter = (offset, texture, rotation = 0) => {
+    const body = Bodies.rectangle(centerX + offset, 130, 135 * scale, 185 * scale, {
       restitution: 0.58,
       friction: 0.4,
       frictionAir: 0.018,
-      angle: rotation,                    // Initial rotation in radians
+      angle: rotation,
       render: {
         sprite: {
           texture: texture,
@@ -51,17 +51,17 @@ function initPhysics() {
     World.add(engine.world, body);
   };
 
-  // Adjust these values freely:
-  createLetter(-240 * scale, 140, 'assets/n.png', -1.00);   // N: x offset, y, rotation
-  createLetter(   0 * scale, 110, 'assets/u.png',  0.00);   // U
-  createLetter( 240 * scale, 155, 'assets/e.png', -0.50);   // E
+  // Adjust these values:
+  createLetter(-spacing, 'assets/n.png', -0.25);
+  createLetter(0,        'assets/u.png',  0.00);
+  createLetter(spacing,  'assets/e.png', -0.20);
 
-  // Mouse drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
 
-  Engine.run(engine);
+  // Modern way - no deprecation warning
+  Runner.run(engine);
   Render.run(render);
 }
 
@@ -72,7 +72,7 @@ setTimeout(() => {
   letters.forEach((letter, i) => {
     Body.setVelocity(letter, { 
       x: (i - 1) * 0.4, 
-      y: 9.0 
+      y: 9.2 
     });
   });
 }, 200);
