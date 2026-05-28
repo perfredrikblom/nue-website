@@ -24,7 +24,12 @@ function initPhysics() {
   buttonBodies = [];
   const baseY = window.innerHeight - 85;
 
-  const createButton = (x, y, width, height, id, text, rotation = 0) => {
+  const createButton = (baseX, text, width, height, id) => {
+    // Random variation on every load
+    const x = baseX + (Math.random() - 0.5) * 70;
+    const y = baseY + (Math.random() - 0.5) * 25;
+    const rotation = (Math.random() - 0.5) * 0.18;
+
     const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
       restitution: 0.68,
@@ -42,23 +47,24 @@ function initPhysics() {
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
+    btn.style.transform = `rotate(${rotation * 18}deg)`;
     document.body.appendChild(btn);
 
     return { body, element: btn };
   };
 
-  // Create buttons with different sizes, positions and slight rotation
-  const tableBtn = createButton(window.innerWidth * 0.16, baseY - 8, 195, 72, 'btn-table', "TABLE", -0.06);
+  // Buttons with variation
+  const tableBtn = createButton(window.innerWidth * 0.16, "TABLE", 195, 72, 'btn-table');
   tableBtn.element.onclick = () => window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
 
-  const venueBtn = createButton(window.innerWidth * 0.39, baseY - 15, 145, 55, 'btn-venue', "VENUE", 0.09);
+  const venueBtn = createButton(window.innerWidth * 0.40, "VENUE", 145, 55, 'btn-venue');
   venueBtn.element.onclick = () => window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
 
-  const socialBtn = createButton(window.innerWidth * 0.62, baseY - 5, 155, 65, 'btn-social', "SOCIAL", -0.04);
+  const socialBtn = createButton(window.innerWidth * 0.62, "SOCIAL", 155, 65, 'btn-social');
   socialBtn.element.onclick = () => window.open('https://instagram.com/nue.bali', '_blank');
 
-  const menuBtn = createButton(window.innerWidth * 0.85, baseY - 12, 160, 52, 'btn-menu', "MENU", 0.07);
-  menuBtn.element.onclick = () => window.open('#', '_blank'); // Update when you have menu link
+  const menuBtn = createButton(window.innerWidth * 0.85, "MENU", 160, 52, 'btn-menu');
+  menuBtn.element.onclick = () => window.open('#', '_blank'); // Update later
 
   // Letters
   letters = [];
@@ -101,7 +107,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click → push closest letter
+// Click → push closest
 document.addEventListener('click', (e) => {
   let closest = null;
   let minDist = Infinity;
