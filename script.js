@@ -22,39 +22,38 @@ function initPhysics() {
   });
 
   buttonBodies = [];
-  const margin = 30;
+  const margin = 40;
   const totalWidth = window.innerWidth - margin * 2;
-  const baseY = window.innerHeight - 95;   // ~1/8 from bottom
+  const slotWidth = totalWidth / 4;
+  const baseY = window.innerHeight - 95;
 
   const texts = ["TABLE", "VENUE", "SOCIAL", "MENU"];
 
-  // Step 2 + 4: Create 4 random proportions that sum to 100%
-  let proportions = [0.22, 0.19, 0.31, 0.28];
-  proportions = proportions.map(p => p + (Math.random() - 0.5) * 0.12); // small random adjustment
-  const sum = proportions.reduce((a, b) => a + b, 0);
-  proportions = proportions.map(p => p / sum); // normalize
-
-  let currentX = margin;
-
   texts.forEach((text, i) => {
-    const slotWidth = totalWidth * proportions[i];
+    let attempts = 0;
+    let svgWidth, svgHeight;
 
-    // Step 5: Strong but safe variation
-    const widthVar = 0.6 + Math.random() * 2.1;   // very strong elongation
-    const heightVar = 0.7 + Math.random() * 1.7;
-    const fontSize = 34 + Math.random() * 32;
-    const slant = (Math.random() - 0.5) * 32;
-    const rotation = (Math.random() - 0.5) * 0.32;
-    const yOffset = (Math.random() - 0.5) * 26;
+    do {
+      attempts++;
+      const widthVar = 0.65 + Math.random() * 1.8;   // strong variation
+      const heightVar = 0.75 + Math.random() * 1.6;
+      const fontSize = 34 + Math.random() * 30;
 
-    const svgWidth = slotWidth * widthVar * 0.95; // safe margin inside slot
-    const svgHeight = 78 * heightVar;
+      svgWidth = slotWidth * widthVar;
+      svgHeight = 78 * heightVar;
+
+    } while (svgWidth > slotWidth * 1.05 && attempts < 15);   // safety check + retry
+
+    const x = margin + slotWidth * i + slotWidth / 2;
+    const y = baseY + (Math.random() - 0.5) * 28;
+    const rotation = (Math.random() - 0.5) * 0.3;
+    const slant = (Math.random() - 0.5) * 30;
 
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
-    svg.style.left = currentX + 'px';
-    svg.style.top = (baseY + yOffset - svgHeight/2) + 'px';
+    svg.style.left = (x - svgWidth/2) + 'px';
+    svg.style.top = (y - svgHeight/2) + 'px';
     svg.style.position = 'absolute';
     svg.style.transform = `rotate(${rotation * 18}deg)`;
 
@@ -62,14 +61,14 @@ function initPhysics() {
       <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
             fill="#D4A373" font-family="Inter, sans-serif" 
             font-size="${fontSize}" font-weight="700"
-            transform="scale(${widthVar}, ${heightVar}) skewX(${slant})">
+            transform="scale(${svgWidth / slotWidth}, ${heightVar}) skewX(${slant})">
         ${text}
       </text>
     `;
 
     document.body.appendChild(svg);
 
-    const body = Bodies.rectangle(currentX + svgWidth/2, parseFloat(svg.style.top) + svgHeight/2, svgWidth, svgHeight, {
+    const body = Bodies.rectangle(x, y, svgWidth, svgHeight, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -85,8 +84,6 @@ function initPhysics() {
       if (text === "SOCIAL") window.open('https://instagram.com/nue.bali', '_blank');
       if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
     });
-
-    currentX += slotWidth;
   });
 
   // Letters
@@ -101,9 +98,7 @@ function initPhysics() {
       friction: 0.4,
       frictionAir: 0.018,
       angle: rotation,
-      render: {
-        sprite: { texture: texture, xScale: scale, yScale: scale }
-      }
+      render: { sprite: { texture: texture, xScale: scale, yScale: scale } }
     });
     letters.push(body);
     World.add(engine.world, body);
@@ -130,7 +125,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push closest letter
+// Click push closest
 document.addEventListener('click', (e) => {
   if (e.target.closest('svg')) return;
 
@@ -148,10 +143,7 @@ document.addEventListener('click', (e) => {
   });
 
   if (closest) {
-    Body.applyForce(closest, closest.position, {
-      x: (Math.random() - 0.5) * 0.13,
-      y: -0.23
-    });
+    Body.applyForce(closest, closest.position, { x: (Math.random() - 0.5) * 0.13, y: -0.23 });
   }
 });
 
