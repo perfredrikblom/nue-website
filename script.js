@@ -23,44 +23,29 @@ function initPhysics() {
 
   buttonBodies = [];
   const baseY = window.innerHeight - 95;
-  const totalWidth = window.innerWidth - 80;   // safe margins
-  const numButtons = 4;
-
-  // Assign random proportions that sum to 100%
-  let proportions = [];
-  let sum = 0;
-  for (let i = 0; i < numButtons; i++) {
-    const p = 0.18 + Math.random() * 0.32;   // between ~18% and 50%
-    proportions.push(p);
-    sum += p;
-  }
-  // Normalize so they exactly fill the width
-  proportions = proportions.map(p => p / sum);
-
-  let currentX = 40;
+  const slotWidth = (window.innerWidth - 80) / 4;   // 4 equal safe slots
 
   const texts = ["TABLE", "VENUE", "SOCIAL", "MENU"];
-  const ids = ["btn-table", "btn-venue", "btn-social", "btn-menu"];
 
   texts.forEach((text, i) => {
-    const slotWidth = totalWidth * proportions[i];
+    const slotCenter = 40 + slotWidth * (i + 0.5);
 
-    // Strong random distortion per button
-    const widthVar = 0.55 + Math.random() * 2.1;     // very strong elongation
-    const heightVar = 0.65 + Math.random() * 1.8;
-    const fontSize = 32 + Math.random() * 34;
-    const slant = (Math.random() - 0.5) * 28;
-    const rotation = (Math.random() - 0.5) * 0.35;
-    const yOffset = (Math.random() - 0.5) * 32;
+    // Strong random distortion inside safe slot
+    const widthVar = 0.5 + Math.random() * 2.3;   // very strong elongation
+    const heightVar = 0.6 + Math.random() * 1.9;
+    const fontSize = 32 + Math.random() * 36;
+    const slant = (Math.random() - 0.5) * 35;
+    const rotation = (Math.random() - 0.5) * 0.38;
+    const yOffset = (Math.random() - 0.5) * 38;
 
-    const svgWidth = slotWidth * widthVar;
-    const svgHeight = 74 * heightVar;
+    const svgWidth = Math.min(slotWidth * 0.95, slotWidth * widthVar);
+    const svgHeight = 76 * heightVar;
 
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
-    svg.style.left = currentX + 'px';
-    svg.style.top = (baseY + yOffset) + 'px';
+    svg.style.left = (slotCenter - svgWidth/2) + 'px';
+    svg.style.top = (baseY + yOffset - svgHeight/2) + 'px';
     svg.style.position = 'absolute';
     svg.style.transform = `rotate(${rotation * 18}deg)`;
 
@@ -75,7 +60,7 @@ function initPhysics() {
 
     document.body.appendChild(svg);
 
-    const body = Bodies.rectangle(currentX + svgWidth/2, baseY + yOffset + svgHeight/2, svgWidth, svgHeight, {
+    const body = Bodies.rectangle(slotCenter, parseFloat(svg.style.top) + svgHeight/2, svgWidth, svgHeight, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -91,8 +76,6 @@ function initPhysics() {
       if (text === "SOCIAL") window.open('https://instagram.com/nue.bali', '_blank');
       if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
     });
-
-    currentX += slotWidth + 28;   // safe gap
   });
 
   // Letters
