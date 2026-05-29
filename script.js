@@ -24,10 +24,19 @@ function initPhysics() {
   buttonBodies = [];
   const baseY = window.innerHeight - 85;
 
-  const createButton = (baseX, text, width, height, id) => {
-    const x = baseX + (Math.random() - 0.5) * 70;
-    const y = baseY + (Math.random() - 0.5) * 28;
-    const rotation = (Math.random() - 0.5) * 0.24;
+  const createButton = (baseX, defaultText, defaultWidth, defaultHeight, id) => {
+    // Strong random variation
+    const x = baseX + (Math.random() - 0.5) * 80;
+    const y = baseY + (Math.random() - 0.5) * 35;
+    const rotation = (Math.random() - 0.5) * 0.26;
+
+    const width = defaultWidth * (0.75 + Math.random() * 0.6);
+    const height = defaultHeight * (0.85 + Math.random() * 0.4);
+
+    const fontSize = 1.1 + Math.random() * 0.55;
+    const weight = 500 + Math.random() * 400;
+    const widthVar = 65 + Math.random() * 75;   // condensed to expanded
+    const slant = (Math.random() - 0.5) * 12;   // subtle italic/oblique
 
     const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
@@ -42,16 +51,19 @@ function initPhysics() {
     const btn = document.createElement('button');
     btn.id = id;
     btn.className = 'physics-button';
-    btn.textContent = text;
+    btn.textContent = defaultText;
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
+    btn.style.fontSize = fontSize + 'rem';
+    btn.style.fontVariationSettings = `"wght" ${weight}, "wdth" ${widthVar}, "slnt" ${slant}`;
+    btn.style.transform = `rotate(${rotation * 18}deg)`;
     document.body.appendChild(btn);
 
     return { body, element: btn };
   };
 
-  // Buttons
+  // Create buttons
   const tableBtn = createButton(window.innerWidth * 0.15, "TABLE", 195, 72, 'btn-table');
   tableBtn.element.onclick = () => window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
 
@@ -105,7 +117,7 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push closest letter
+// Click push closest
 document.addEventListener('click', (e) => {
   if (e.target.tagName === 'BUTTON') return;
 

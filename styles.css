@@ -1,14 +1,13 @@
 /* styles.css */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap');
 
-body {
-  margin: 0;
-  background: #0A3D2B;
-  overflow: hidden;
-  font-family: 'Inter', system-ui, sans-serif;
+body { 
+  margin: 0; 
+  background: #0A3D2B; 
+  overflow: hidden; 
+  font-family: 'Inter', system-ui, sans-serif; 
 }
 
-/* Button styling */
 .physics-button {
   position: absolute;
   background: transparent;
@@ -17,16 +16,6 @@ body {
   cursor: pointer;
   padding: 0;
   z-index: 100;
-  transition: color 0.25s ease;
-  font-variation-settings: "wdth" 100, "wght" 600;
+  transition: color 0.25s;
+  white-space: nowrap;
 }
-
-.physics-button:hover {
-  color: #ffffff;
-}
-
-/* Unique button typography */
-#btn-table   { font-size: 1.58rem; font-variation-settings: "wdth" 72, "wght" 780; }
-#btn-venue   { font-size: 1.22rem; font-variation-settings: "wdth" 118, "wght" 520; }
-#btn-social  { font-size: 1.38rem; font-variation-settings: "wdth" 88, "wght" 680; }
-#btn-menu    { font-size: 1.45rem; font-variation-settings: "wdth" 65, "wght" 820; letter-spacing: 0.04em; }
