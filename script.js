@@ -24,20 +24,37 @@ function initPhysics() {
   buttonBodies = [];
   const baseY = window.innerHeight - 85;
 
-  const createButton = (baseX, text, id) => {
-    // Strong random variation
-    const x = baseX + (Math.random() - 0.5) * 40;
+  const createSvgButton = (baseX, text, id) => {
+    const x = baseX + (Math.random() - 0.5) * 60;
     const y = baseY + (Math.random() - 0.5) * 30;
-    const rotation = (Math.random() - 0.5) * 0.22;
+    const rotation = (Math.random() - 0.5) * 0.3;
 
-    const wdth = 55 + Math.random() * 95;     // Very strong elongation/condensation
-    const wght = 500 + Math.random() * 400;
-    const fontSize = 1.05 + Math.random() * 0.65;
+    // Random strong distortion
+    const scaleX = 0.6 + Math.random() * 1.8;   // horizontal stretch
+    const scaleY = 0.7 + Math.random() * 1.4;   // vertical stretch
+    const fontSize = 42 + Math.random() * 28;
 
-    const width = 130 + Math.random() * 110;
-    const height = 48 + Math.random() * 28;
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", "220");
+    svg.setAttribute("height", "80");
+    svg.setAttribute("class", "svg-button");
+    svg.style.left = (x - 110) + 'px';
+    svg.style.top = (y - 40) + 'px';
+    svg.style.transform = `rotate(${rotation * 18}deg)`;
 
-    const body = Bodies.rectangle(x, y, width, height, {
+    svg.innerHTML = `
+      <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" 
+            fill="#D4A373" font-family="Inter, sans-serif" 
+            font-size="${fontSize}" font-weight="700"
+            transform="scale(${scaleX}, ${scaleY})">
+        ${text}
+      </text>
+    `;
+
+    document.body.appendChild(svg);
+
+    // Physics body (for collision)
+    const body = Bodies.rectangle(x, y, 180, 65, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -47,25 +64,18 @@ function initPhysics() {
     World.add(engine.world, body);
     buttonBodies.push(body);
 
-    const btn = document.createElement('button');
-    btn.id = id;
-    btn.className = 'physics-button';
-    btn.textContent = text;
-    btn.style.left = (x - width/2) + 'px';
-    btn.style.top = (y - height/2) + 'px';
-    btn.style.width = width + 'px';
-    btn.style.fontSize = fontSize + 'rem';
-    btn.style.fontVariationSettings = `"wdth" ${wdth}, "wght" ${wght}`;
-    btn.style.transform = `rotate(${rotation * 18}deg)`;
-    document.body.appendChild(btn);
-
-    return { body, element: btn };
+    svg.addEventListener('click', () => {
+      if (id === 'btn-table') window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
+      if (id === 'btn-venue') window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
+      if (id === 'btn-social') window.open('https://instagram.com/nue.bali', '_blank');
+      if (id === 'btn-menu') window.open('https://secure.guestpro.net/nue', '_blank');
+    });
   };
 
-  createButton(window.innerWidth * 0.14, "TABLE", 'btn-table');
-  createButton(window.innerWidth * 0.37, "VENUE", 'btn-venue');
-  createButton(window.innerWidth * 0.60, "SOCIAL", 'btn-social');
-  createButton(window.innerWidth * 0.83, "MENU", 'btn-menu');
+  createSvgButton(window.innerWidth * 0.15, "TABLE", 'btn-table');
+  createSvgButton(window.innerWidth * 0.38, "VENUE", 'btn-venue');
+  createSvgButton(window.innerWidth * 0.60, "SOCIAL", 'btn-social');
+  createSvgButton(window.innerWidth * 0.82, "MENU", 'btn-menu');
 
   // Letters
   letters = [];
@@ -108,9 +118,9 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push closest
+// Click push closest letter
 document.addEventListener('click', (e) => {
-  if (e.target.tagName === 'BUTTON') return;
+  if (e.target.tagName === 'BUTTON' || e.target.closest('svg')) return;
 
   let closest = null;
   let minDist = Infinity;
