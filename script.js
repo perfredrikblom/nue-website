@@ -23,32 +23,46 @@ function initPhysics() {
 
   buttonBodies = [];
   const baseY = window.innerHeight - 95;
-  let currentX = 50;   // safe left margin
+  const totalWidth = window.innerWidth - 80;   // safe margins
+  const numButtons = 4;
 
-  const createSvgButton = (text) => {
-    const maxWidth = Math.max(130, (window.innerWidth - 120) / 4.5);
+  // Assign random proportions that sum to 100%
+  let proportions = [];
+  let sum = 0;
+  for (let i = 0; i < numButtons; i++) {
+    const p = 0.18 + Math.random() * 0.32;   // between ~18% and 50%
+    proportions.push(p);
+    sum += p;
+  }
+  // Normalize so they exactly fill the width
+  proportions = proportions.map(p => p / sum);
 
-    const widthVar = 0.65 + Math.random() * 1.55;   // strong horizontal variation
-    const heightVar = 0.75 + Math.random() * 1.35;
-    const fontSize = 34 + Math.random() * 26;
-    const rotation = (Math.random() - 0.5) * 0.22;
-    const slant = (Math.random() - 0.5) * 15;       // italic/oblique variation
+  let currentX = 40;
 
-    const svgWidth = maxWidth * widthVar;
-    const svgHeight = 72 * heightVar;
+  const texts = ["TABLE", "VENUE", "SOCIAL", "MENU"];
+  const ids = ["btn-table", "btn-venue", "btn-social", "btn-menu"];
 
-    // Safety check to avoid going off screen
-    if (currentX + svgWidth > window.innerWidth - 40) {
-      currentX = 50;
-    }
+  texts.forEach((text, i) => {
+    const slotWidth = totalWidth * proportions[i];
+
+    // Strong random distortion per button
+    const widthVar = 0.55 + Math.random() * 2.1;     // very strong elongation
+    const heightVar = 0.65 + Math.random() * 1.8;
+    const fontSize = 32 + Math.random() * 34;
+    const slant = (Math.random() - 0.5) * 28;
+    const rotation = (Math.random() - 0.5) * 0.35;
+    const yOffset = (Math.random() - 0.5) * 32;
+
+    const svgWidth = slotWidth * widthVar;
+    const svgHeight = 74 * heightVar;
 
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
     svg.style.left = currentX + 'px';
-    svg.style.top = (baseY - svgHeight/2 + (Math.random() - 0.5) * 25) + 'px';
-    svg.style.transform = `rotate(${rotation * 18}deg)`;
+    svg.style.top = (baseY + yOffset) + 'px';
     svg.style.position = 'absolute';
+    svg.style.transform = `rotate(${rotation * 18}deg)`;
 
     svg.innerHTML = `
       <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
@@ -61,7 +75,7 @@ function initPhysics() {
 
     document.body.appendChild(svg);
 
-    const body = Bodies.rectangle(currentX + svgWidth/2, parseFloat(svg.style.top) + svgHeight/2, svgWidth, svgHeight, {
+    const body = Bodies.rectangle(currentX + svgWidth/2, baseY + yOffset + svgHeight/2, svgWidth, svgHeight, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -78,13 +92,8 @@ function initPhysics() {
       if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
     });
 
-    currentX += svgWidth + 45;   // safe spacing
-  };
-
-  createSvgButton("TABLE");
-  createSvgButton("VENUE");
-  createSvgButton("SOCIAL");
-  createSvgButton("MENU");
+    currentX += slotWidth + 28;   // safe gap
+  });
 
   // Letters
   letters = [];
