@@ -26,34 +26,35 @@ function initPhysics() {
   let currentX = 50;   // safe left margin
 
   const createSvgButton = (text) => {
-    const maxWidth = Math.max(140, (window.innerWidth - 100) / 4.5);
-    
-    const widthVar = 0.7 + Math.random() * 1.6;   // strong but safe
-    const heightVar = 0.8 + Math.random() * 1.3;
-    const fontSize = 36 + Math.random() * 24;
-    const rotation = (Math.random() - 0.5) * 0.25;
+    const maxWidth = Math.max(130, (window.innerWidth - 120) / 4.5);
+
+    const widthVar = 0.65 + Math.random() * 1.55;   // strong horizontal variation
+    const heightVar = 0.75 + Math.random() * 1.35;
+    const fontSize = 34 + Math.random() * 26;
+    const rotation = (Math.random() - 0.5) * 0.22;
+    const slant = (Math.random() - 0.5) * 15;       // italic/oblique variation
 
     const svgWidth = maxWidth * widthVar;
-    const svgHeight = 78 * heightVar;
+    const svgHeight = 72 * heightVar;
 
-    // Keep within screen bounds
-    if (currentX + svgWidth > window.innerWidth - 50) {
+    // Safety check to avoid going off screen
+    if (currentX + svgWidth > window.innerWidth - 40) {
       currentX = 50;
     }
 
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
-    svg.setAttribute("class", "svg-button");
     svg.style.left = currentX + 'px';
     svg.style.top = (baseY - svgHeight/2 + (Math.random() - 0.5) * 25) + 'px';
     svg.style.transform = `rotate(${rotation * 18}deg)`;
+    svg.style.position = 'absolute';
 
     svg.innerHTML = `
       <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
             fill="#D4A373" font-family="Inter, sans-serif" 
             font-size="${fontSize}" font-weight="700"
-            transform="scale(${widthVar}, ${heightVar})">
+            transform="scale(${widthVar}, ${heightVar}) skewX(${slant})">
         ${text}
       </text>
     `;
@@ -77,7 +78,7 @@ function initPhysics() {
       if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
     });
 
-    currentX += svgWidth + 40;   // safe spacing
+    currentX += svgWidth + 45;   // safe spacing
   };
 
   createSvgButton("TABLE");
@@ -126,9 +127,9 @@ setTimeout(() => {
   });
 }, 200);
 
-// Click push closest letter
+// Click push closest
 document.addEventListener('click', (e) => {
-  if (e.target.tagName === 'BUTTON' || e.target.closest('svg')) return;
+  if (e.target.closest('svg')) return;
 
   let closest = null;
   let minDist = Infinity;
