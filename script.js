@@ -1,7 +1,7 @@
 // script.js
 const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Runner } = Matter;
 
-let engine, render, letters = [];
+let engine, render, letters = [], buttonBodies = [];
 
 function initPhysics() {
   if (render) Render.stop(render);
@@ -21,48 +21,44 @@ function initPhysics() {
     }
   });
 
-  // Ground
-  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 45, window.innerWidth * 2, 100, {
-    isStatic: true,
-    restitution: 0.68,
-    render: { visible: false }
-  });
-  World.add(engine.world, ground);
-
-  // Tight slot layout - no extra padding
-  const margin = 20;
+  buttonBodies = [];
+  const margin = 30;
   const totalWidth = window.innerWidth - margin * 2;
   const slotWidth = totalWidth / 4;
-  const baseY = window.innerHeight - 88;
+  const baseY = window.innerHeight - 95;
 
   const texts = ["TABLE", "VENUE", "SOCIAL", "MENU"];
 
-  texts.forEach((text, i) => {
-    const x = margin + slotWidth * (i + 0.5);
+  texts.forEach((text) => {
+    let attempts = 0;
+    let svgWidth, svgHeight, widthVar, heightVar;
 
-    // Strong but guaranteed-to-fit variation
-    const widthVar = 0.68 + Math.random() * 1.65;
-    const heightVar = 0.78 + Math.random() * 1.45;
-    const fontSize = 37 + Math.random() * 26;
-    const slant = (Math.random() - 0.5) * 28;
-    const rotation = (Math.random() - 0.5) * 0.26;
-    const yOffset = (Math.random() - 0.5) * 22;
+    // Retry loop until it fits safely
+    do {
+      attempts++;
+      widthVar = 0.65 + Math.random() * 2.1;   // very strong variation
+      heightVar = 0.75 + Math.random() * 1.8;
+      svgWidth = slotWidth * widthVar;
+      svgHeight = 78 * heightVar;
+    } while (svgWidth > slotWidth * 1.02 && attempts < 30);   // safety retry
 
-    const svgWidth = slotWidth * 0.98;   // almost full slot
-    const svgHeight = 76 * heightVar;
+    const x = margin + slotWidth * (texts.indexOf(text) + 0.5);
+    const y = baseY + (Math.random() - 0.5) * 32;
+    const rotation = (Math.random() - 0.5) * 0.32;
+    const slant = (Math.random() - 0.5) * 32;
 
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
     svg.style.left = (x - svgWidth/2) + 'px';
-    svg.style.top = (baseY + yOffset - svgHeight/2) + 'px';
+    svg.style.top = (y - svgHeight/2) + 'px';
     svg.style.position = 'absolute';
     svg.style.transform = `rotate(${rotation * 18}deg)`;
 
     svg.innerHTML = `
       <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
             fill="#D4A373" font-family="Inter, sans-serif" 
-            font-size="${fontSize}" font-weight="700"
+            font-size="${36 + Math.random() * 32}" font-weight="700"
             transform="scale(${widthVar}, ${heightVar}) skewX(${slant})">
         ${text}
       </text>
@@ -70,7 +66,7 @@ function initPhysics() {
 
     document.body.appendChild(svg);
 
-    const body = Bodies.rectangle(x, baseY + yOffset, svgWidth, svgHeight, {
+    const body = Bodies.rectangle(x, y, svgWidth, svgHeight, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -78,6 +74,7 @@ function initPhysics() {
       render: { visible: false }
     });
     World.add(engine.world, body);
+    buttonBodies.push(body);
 
     svg.addEventListener('click', () => {
       if (text === "TABLE") window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
@@ -99,9 +96,7 @@ function initPhysics() {
       friction: 0.4,
       frictionAir: 0.018,
       angle: rotation,
-      render: {
-        sprite: { texture: texture, xScale: scale, yScale: scale }
-      }
+      render: { sprite: { texture: texture, xScale: scale, yScale: scale } }
     });
     letters.push(body);
     World.add(engine.world, body);
@@ -146,10 +141,7 @@ document.addEventListener('click', (e) => {
   });
 
   if (closest) {
-    Body.applyForce(closest, closest.position, {
-      x: (Math.random() - 0.5) * 0.13,
-      y: -0.23
-    });
+    Body.applyForce(closest, closest.position, { x: (Math.random() - 0.5) * 0.13, y: -0.23 });
   }
 });
 
