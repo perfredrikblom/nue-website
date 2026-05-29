@@ -22,39 +22,43 @@ function initPhysics() {
   });
 
   buttonBodies = [];
-  const baseY = window.innerHeight - 85;
+  const baseY = window.innerHeight - 90;
+  const margin = 40;
+  let currentX = margin;
 
-  const createSvgButton = (baseX, text, id) => {
-    const x = baseX + (Math.random() - 0.5) * 60;
-    const y = baseY + (Math.random() - 0.5) * 30;
-    const rotation = (Math.random() - 0.5) * 0.3;
+  const createSvgButton = (text) => {
+    // Calculate safe width based on remaining space
+    const maxWidth = Math.max(120, (window.innerWidth - margin * 2) / 4.2);
+    const widthVar = 0.65 + Math.random() * 1.8;   // strong but safe elongation
+    const heightVar = 0.75 + Math.random() * 1.4;
+    const fontSize = 38 + Math.random() * 26;
+    const rotation = (Math.random() - 0.5) * 0.28;
 
-    // Random strong distortion
-    const scaleX = 0.6 + Math.random() * 1.8;   // horizontal stretch
-    const scaleY = 0.7 + Math.random() * 1.4;   // vertical stretch
-    const fontSize = 42 + Math.random() * 28;
+    const svgWidth = maxWidth * widthVar;
+    const svgHeight = 72 * heightVar;
 
+    // Create SVG button
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", "220");
-    svg.setAttribute("height", "80");
+    svg.setAttribute("width", svgWidth);
+    svg.setAttribute("height", svgHeight);
     svg.setAttribute("class", "svg-button");
-    svg.style.left = (x - 110) + 'px';
-    svg.style.top = (y - 40) + 'px';
+    svg.style.left = currentX + 'px';
+    svg.style.top = (baseY - svgHeight/2 + (Math.random() - 0.5) * 30) + 'px';
     svg.style.transform = `rotate(${rotation * 18}deg)`;
 
     svg.innerHTML = `
-      <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" 
+      <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
             fill="#D4A373" font-family="Inter, sans-serif" 
             font-size="${fontSize}" font-weight="700"
-            transform="scale(${scaleX}, ${scaleY})">
+            transform="scale(${widthVar}, ${heightVar})">
         ${text}
       </text>
     `;
 
     document.body.appendChild(svg);
 
-    // Physics body (for collision)
-    const body = Bodies.rectangle(x, y, 180, 65, {
+    // Physics body for collision
+    const body = Bodies.rectangle(currentX + svgWidth/2, parseFloat(svg.style.top) + svgHeight/2, svgWidth, svgHeight, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -64,18 +68,22 @@ function initPhysics() {
     World.add(engine.world, body);
     buttonBodies.push(body);
 
+    // Click handler
     svg.addEventListener('click', () => {
-      if (id === 'btn-table') window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
-      if (id === 'btn-venue') window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
-      if (id === 'btn-social') window.open('https://instagram.com/nue.bali', '_blank');
-      if (id === 'btn-menu') window.open('https://secure.guestpro.net/nue', '_blank');
+      if (text === "TABLE") window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
+      if (text === "VENUE") window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
+      if (text === "SOCIAL") window.open('https://instagram.com/nue.bali', '_blank');
+      if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
     });
+
+    currentX += svgWidth + 35;   // safe spacing
   };
 
-  createSvgButton(window.innerWidth * 0.15, "TABLE", 'btn-table');
-  createSvgButton(window.innerWidth * 0.38, "VENUE", 'btn-venue');
-  createSvgButton(window.innerWidth * 0.60, "SOCIAL", 'btn-social');
-  createSvgButton(window.innerWidth * 0.82, "MENU", 'btn-menu');
+  // Create buttons
+  createSvgButton("TABLE");
+  createSvgButton("VENUE");
+  createSvgButton("SOCIAL");
+  createSvgButton("MENU");
 
   // Letters
   letters = [];
