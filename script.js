@@ -24,19 +24,17 @@ function initPhysics() {
   buttonBodies = [];
   const baseY = window.innerHeight - 85;
 
-  const createButton = (baseX, defaultText, defaultWidth, defaultHeight, id) => {
-    // Strong random variation
-    const x = baseX + (Math.random() - 0.5) * 80;
-    const y = baseY + (Math.random() - 0.5) * 35;
-    const rotation = (Math.random() - 0.5) * 0.26;
+  const createButton = (baseX, text, baseWidth, baseHeight, id) => {
+    // Stronger random variation
+    let x = baseX + (Math.random() - 0.5) * 110;
+    let y = baseY + (Math.random() - 0.5) * 38;
+    const rotation = (Math.random() - 0.5) * 0.32;
 
-    const width = defaultWidth * (0.75 + Math.random() * 0.6);
-    const height = defaultHeight * (0.85 + Math.random() * 0.4);
-
-    const fontSize = 1.1 + Math.random() * 0.55;
-    const weight = 500 + Math.random() * 400;
-    const widthVar = 65 + Math.random() * 75;   // condensed to expanded
-    const slant = (Math.random() - 0.5) * 12;   // subtle italic/oblique
+    const width = baseWidth * (0.78 + Math.random() * 0.65);
+    const height = baseHeight * (0.82 + Math.random() * 0.55);
+    const fontSize = 1.08 + Math.random() * 0.62;
+    const weight = 480 + Math.random() * 420;
+    const wdth = 62 + Math.random() * 78;
 
     const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
@@ -51,30 +49,23 @@ function initPhysics() {
     const btn = document.createElement('button');
     btn.id = id;
     btn.className = 'physics-button';
-    btn.textContent = defaultText;
+    btn.textContent = text;
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
     btn.style.fontSize = fontSize + 'rem';
-    btn.style.fontVariationSettings = `"wght" ${weight}, "wdth" ${widthVar}, "slnt" ${slant}`;
+    btn.style.fontVariationSettings = `"wght" ${weight}, "wdth" ${wdth}`;
     btn.style.transform = `rotate(${rotation * 18}deg)`;
     document.body.appendChild(btn);
 
     return { body, element: btn };
   };
 
-  // Create buttons
-  const tableBtn = createButton(window.innerWidth * 0.15, "TABLE", 195, 72, 'btn-table');
-  tableBtn.element.onclick = () => window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
-
-  const venueBtn = createButton(window.innerWidth * 0.38, "VENUE", 145, 55, 'btn-venue');
-  venueBtn.element.onclick = () => window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
-
-  const socialBtn = createButton(window.innerWidth * 0.60, "SOCIAL", 155, 65, 'btn-social');
-  socialBtn.element.onclick = () => window.open('https://instagram.com/nue.bali', '_blank');
-
-  const menuBtn = createButton(window.innerWidth * 0.82, "MENU", 160, 58, 'btn-menu');
-  menuBtn.element.onclick = () => window.open('https://secure.guestpro.net/nue', '_blank');
+  // Buttons with good base spacing
+  createButton(window.innerWidth * 0.13, "TABLE", 195, 72, 'btn-table');
+  createButton(window.innerWidth * 0.36, "VENUE", 145, 55, 'btn-venue');
+  createButton(window.innerWidth * 0.59, "SOCIAL", 155, 65, 'btn-social');
+  createButton(window.innerWidth * 0.82, "MENU", 160, 58, 'btn-menu');
 
   // Letters
   letters = [];
