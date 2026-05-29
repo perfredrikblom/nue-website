@@ -1,7 +1,14 @@
 // script.js
 const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Runner } = Matter;
 
-let engine, render, letters = [], buttonBodies = [];
+let engine, render;
+
+// Create debug text function
+function log(message) {
+  const debug = document.getElementById('debug');
+  debug.innerHTML += message + "<br>";
+  console.log(message);
+}
 
 function initPhysics() {
   if (render) Render.stop(render);
@@ -21,128 +28,89 @@ function initPhysics() {
     }
   });
 
-  buttonBodies = [];
-  const margin = 30;
-  const totalWidth = window.innerWidth - margin * 2;
-  const slotWidth = totalWidth / 4;
-  const baseY = window.innerHeight - 95;
+  log("Window size: " + window.innerWidth + " x " + window.innerHeight);
 
-  const texts = ["TABLE", "VENUE", "SOCIAL", "MENU"];
-
-  texts.forEach((text) => {
-    let attempts = 0;
-    let svgWidth, svgHeight, widthVar, heightVar;
-
-    // Retry loop until it fits safely
-    do {
-      attempts++;
-      widthVar = 0.65 + Math.random() * 2.1;   // very strong variation
-      heightVar = 0.75 + Math.random() * 1.8;
-      svgWidth = slotWidth * widthVar;
-      svgHeight = 78 * heightVar;
-    } while (svgWidth > slotWidth * 1.02 && attempts < 30);   // safety retry
-
-    const x = margin + slotWidth * (texts.indexOf(text) + 0.5);
-    const y = baseY + (Math.random() - 0.5) * 32;
-    const rotation = (Math.random() - 0.5) * 0.32;
-    const slant = (Math.random() - 0.5) * 32;
-
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("width", svgWidth);
-    svg.setAttribute("height", svgHeight);
-    svg.style.left = (x - svgWidth/2) + 'px';
-    svg.style.top = (y - svgHeight/2) + 'px';
-    svg.style.position = 'absolute';
-    svg.style.transform = `rotate(${rotation * 18}deg)`;
-
-    svg.innerHTML = `
-      <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
-            fill="#D4A373" font-family="Inter, sans-serif" 
-            font-size="${36 + Math.random() * 32}" font-weight="700"
-            transform="scale(${widthVar}, ${heightVar}) skewX(${slant})">
-        ${text}
-      </text>
-    `;
-
-    document.body.appendChild(svg);
-
-    const body = Bodies.rectangle(x, y, svgWidth, svgHeight, {
-      isStatic: true,
-      restitution: 0.68,
-      friction: 0.4,
-      angle: rotation,
-      render: { visible: false }
-    });
-    World.add(engine.world, body);
-    buttonBodies.push(body);
-
-    svg.addEventListener('click', () => {
-      if (text === "TABLE") window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
-      if (text === "VENUE") window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
-      if (text === "SOCIAL") window.open('https://instagram.com/nue.bali', '_blank');
-      if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
-    });
+  // Ground
+  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 45, window.innerWidth * 2, 100, {
+    isStatic: true,
+    restitution: 0.68,
+    render: { visible: false }
   });
+  World.add(engine.world, ground);
 
-  // Letters
-  letters = [];
-  const centerX = window.innerWidth / 2;
+  // === TABLE BUTTON DEBUG ===
+  const margin = 40;
+  const totalWidth = window.innerWidth - margin * 2;
+  const slotWidth = totalWidth * 0.4;   // only one button for debug
+
+  let attempts = 0;
+  let svgWidth, svgHeight, widthVar, heightVar;
+
+  do {
+    attempts++;
+    widthVar = 0.6 + Math.random() * 2.4;
+    heightVar = 0.7 + Math.random() * 1.8;
+    svgWidth = slotWidth * widthVar;
+    svgHeight = 82 * heightVar;
+
+    log(`Attempt ${attempts}: widthVar=${widthVar.toFixed(2)}, svgWidth=${svgWidth.toFixed(0)} (max allowed ${slotWidth.toFixed(0)})`);
+  } while (svgWidth > slotWidth * 1.05 && attempts < 20);
+
+  const x = margin + slotWidth / 2;
+  const y = window.innerHeight - 110;
+
+  log(`Final position: x=${x.toFixed(0)}, y=${y.toFixed(0)}, size=${svgWidth.toFixed(0)}x${svgHeight.toFixed(0)}`);
+
+  // Visible frame
+  const frame = document.createElement('div');
+  frame.className = 'button-frame';
+  frame.style.left = (x - svgWidth/2) + 'px';
+  frame.style.top = (y - svgHeight/2) + 'px';
+  frame.style.width = svgWidth + 'px';
+  frame.style.height = svgHeight + 'px';
+  document.body.appendChild(frame);
+
+  // SVG text
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", svgWidth);
+  svg.setAttribute("height", svgHeight);
+  svg.style.left = (x - svgWidth/2) + 'px';
+  svg.style.top = (y - svgHeight/2) + 'px';
+  svg.style.position = 'absolute';
+
+  svg.innerHTML = `
+    <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle"
+          fill="#D4A373" font-family="Inter, sans-serif" 
+          font-size="42" font-weight="700"
+          transform="scale(${widthVar}, ${heightVar})">
+      TABLE
+    </text>
+  `;
+
+  document.body.appendChild(svg);
+
+  const body = Bodies.rectangle(x, y, svgWidth, svgHeight, {
+    isStatic: true,
+    restitution: 0.68,
+    render: { visible: false }
+  });
+  World.add(engine.world, body);
+
+  // Letters for reference
   const scale = Math.min(1.05, window.innerWidth / 1200);
   const spacing = 280 * scale;
+  const n = Bodies.rectangle(window.innerWidth/2 - spacing, 130, 135 * scale, 185 * scale, { restitution: 0.58, render: { sprite: { texture: 'assets/n.png', xScale: scale, yScale: scale } } });
+  const u = Bodies.rectangle(window.innerWidth/2, 130, 135 * scale, 185 * scale, { restitution: 0.58, render: { sprite: { texture: 'assets/u.png', xScale: scale, yScale: scale } } });
+  const e = Bodies.rectangle(window.innerWidth/2 + spacing, 130, 135 * scale, 185 * scale, { restitution: 0.58, render: { sprite: { texture: 'assets/e.png', xScale: scale, yScale: scale } } });
 
-  const createLetter = (offset, texture, rotation = 0) => {
-    const body = Bodies.rectangle(centerX + offset, 130, 135 * scale, 185 * scale, {
-      restitution: 0.58,
-      friction: 0.4,
-      frictionAir: 0.018,
-      angle: rotation,
-      render: { sprite: { texture: texture, xScale: scale, yScale: scale } }
-    });
-    letters.push(body);
-    World.add(engine.world, body);
-  };
-
-  createLetter(-spacing, 'assets/n.png', -0.25);
-  createLetter(0,        'assets/u.png',  0.00);
-  createLetter(spacing,  'assets/e.png', -0.20);
-
-  const mouse = Mouse.create(render.canvas);
-  const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
-  World.add(engine.world, mouseConstraint);
+  World.add(engine.world, [n, u, e]);
 
   Runner.run(engine);
   Render.run(render);
+
+  log("✅ Finished. Look at the visible frame around TABLE and the debug text above.");
 }
 
 initPhysics();
-
-// Initial drop
-setTimeout(() => {
-  letters.forEach((letter, i) => {
-    Body.setVelocity(letter, { x: (i - 1) * 0.4, y: 9.2 });
-  });
-}, 200);
-
-// Click push closest
-document.addEventListener('click', (e) => {
-  if (e.target.closest('svg')) return;
-
-  let closest = null;
-  let minDist = Infinity;
-
-  letters.forEach(letter => {
-    const dx = letter.position.x - e.clientX;
-    const dy = letter.position.y - e.clientY;
-    const dist = dx*dx + dy*dy;
-    if (dist < minDist) {
-      minDist = dist;
-      closest = letter;
-    }
-  });
-
-  if (closest) {
-    Body.applyForce(closest, closest.position, { x: (Math.random() - 0.5) * 0.13, y: -0.23 });
-  }
-});
 
 window.addEventListener('resize', initPhysics);

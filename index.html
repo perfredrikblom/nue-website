@@ -3,14 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NUE - Canggu</title>
+  <title>NUE - Debug</title>
   <script src="https://cdn.jsdelivr.net/npm/matter-js@0.19.0/build/matter.min.js"></script>
   <style>
     body { margin: 0; background: #0A3D2B; overflow: hidden; }
-    .svg-button { position: absolute; z-index: 100; cursor: pointer; }
+    #debug { position: fixed; top: 10px; left: 10px; color: #D4A373; font-family: monospace; z-index: 1000; line-height: 1.4; background: rgba(0,0,0,0.6); padding: 10px; border-radius: 6px; }
+    .button-frame { position: absolute; border: 3px solid #D4A373; pointer-events: none; z-index: 50; }
   </style>
 </head>
 <body>
+  <div id="debug">Debug started...</div>
   <script src="script.js"></script>
 </body>
 </html>
