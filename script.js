@@ -22,28 +22,31 @@ function initPhysics() {
   });
 
   buttonBodies = [];
-  const baseY = window.innerHeight - 90;
-  const margin = 40;
-  let currentX = margin;
+  const baseY = window.innerHeight - 95;
+  let currentX = 50;   // safe left margin
 
   const createSvgButton = (text) => {
-    // Calculate safe width based on remaining space
-    const maxWidth = Math.max(120, (window.innerWidth - margin * 2) / 4.2);
-    const widthVar = 0.65 + Math.random() * 1.8;   // strong but safe elongation
-    const heightVar = 0.75 + Math.random() * 1.4;
-    const fontSize = 38 + Math.random() * 26;
-    const rotation = (Math.random() - 0.5) * 0.28;
+    const maxWidth = Math.max(140, (window.innerWidth - 100) / 4.5);
+    
+    const widthVar = 0.7 + Math.random() * 1.6;   // strong but safe
+    const heightVar = 0.8 + Math.random() * 1.3;
+    const fontSize = 36 + Math.random() * 24;
+    const rotation = (Math.random() - 0.5) * 0.25;
 
     const svgWidth = maxWidth * widthVar;
-    const svgHeight = 72 * heightVar;
+    const svgHeight = 78 * heightVar;
 
-    // Create SVG button
+    // Keep within screen bounds
+    if (currentX + svgWidth > window.innerWidth - 50) {
+      currentX = 50;
+    }
+
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", svgWidth);
     svg.setAttribute("height", svgHeight);
     svg.setAttribute("class", "svg-button");
     svg.style.left = currentX + 'px';
-    svg.style.top = (baseY - svgHeight/2 + (Math.random() - 0.5) * 30) + 'px';
+    svg.style.top = (baseY - svgHeight/2 + (Math.random() - 0.5) * 25) + 'px';
     svg.style.transform = `rotate(${rotation * 18}deg)`;
 
     svg.innerHTML = `
@@ -57,7 +60,6 @@ function initPhysics() {
 
     document.body.appendChild(svg);
 
-    // Physics body for collision
     const body = Bodies.rectangle(currentX + svgWidth/2, parseFloat(svg.style.top) + svgHeight/2, svgWidth, svgHeight, {
       isStatic: true,
       restitution: 0.68,
@@ -68,7 +70,6 @@ function initPhysics() {
     World.add(engine.world, body);
     buttonBodies.push(body);
 
-    // Click handler
     svg.addEventListener('click', () => {
       if (text === "TABLE") window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
       if (text === "VENUE") window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
@@ -76,10 +77,9 @@ function initPhysics() {
       if (text === "MENU") window.open('https://secure.guestpro.net/nue', '_blank');
     });
 
-    currentX += svgWidth + 35;   // safe spacing
+    currentX += svgWidth + 40;   // safe spacing
   };
 
-  // Create buttons
   createSvgButton("TABLE");
   createSvgButton("VENUE");
   createSvgButton("SOCIAL");
