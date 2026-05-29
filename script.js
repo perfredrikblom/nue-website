@@ -22,30 +22,22 @@ function initPhysics() {
   });
 
   buttonBodies = [];
-
   const baseY = window.innerHeight - 85;
-  const buttons = [
-    { text: "TABLE",   id: "btn-table",   baseWidth: 195 },
-    { text: "VENUE",   id: "btn-venue",   baseWidth: 145 },
-    { text: "SOCIAL",  id: "btn-social",  baseWidth: 155 },
-    { text: "MENU",    id: "btn-menu",    baseWidth: 160 }
-  ];
 
-  let currentX = window.innerWidth * 0.08;   // start from left with margin
+  const createButton = (baseX, text, id) => {
+    // Strong random variation
+    const x = baseX + (Math.random() - 0.5) * 40;
+    const y = baseY + (Math.random() - 0.5) * 30;
+    const rotation = (Math.random() - 0.5) * 0.22;
 
-  buttons.forEach(btnData => {
-    // Strong random typography
-    const widthVar = 55 + Math.random() * 85;     // strong elongation / condensation
-    const weight = 500 + Math.random() * 400;
-    const fontSize = 1.1 + Math.random() * 0.55;
-    const yOffset = (Math.random() - 0.5) * 38;
-    const rotation = (Math.random() - 0.5) * 0.25;
+    const wdth = 55 + Math.random() * 95;     // Very strong elongation/condensation
+    const wght = 500 + Math.random() * 400;
+    const fontSize = 1.05 + Math.random() * 0.65;
 
-    const width = btnData.baseWidth * (0.8 + Math.random() * 0.6);
-    const height = 58 + Math.random() * 22;
+    const width = 130 + Math.random() * 110;
+    const height = 48 + Math.random() * 28;
 
-    // Create physics body
-    const body = Bodies.rectangle(currentX + width/2, baseY + yOffset, width, height, {
+    const body = Bodies.rectangle(x, y, width, height, {
       isStatic: true,
       restitution: 0.68,
       friction: 0.4,
@@ -55,24 +47,27 @@ function initPhysics() {
     World.add(engine.world, body);
     buttonBodies.push(body);
 
-    // Visual button
     const btn = document.createElement('button');
-    btn.id = btnData.id;
+    btn.id = id;
     btn.className = 'physics-button';
-    btn.textContent = btnData.text;
-    btn.style.left = (currentX) + 'px';
-    btn.style.top = (baseY + yOffset - height/2) + 'px';
+    btn.textContent = text;
+    btn.style.left = (x - width/2) + 'px';
+    btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
     btn.style.fontSize = fontSize + 'rem';
-    btn.style.fontVariationSettings = `"wght" ${weight}, "wdth" ${widthVar}`;
+    btn.style.fontVariationSettings = `"wdth" ${wdth}, "wght" ${wght}`;
     btn.style.transform = `rotate(${rotation * 18}deg)`;
     document.body.appendChild(btn);
 
-    // Move to next position
-    currentX += width + 25;   // spacing between buttons
-  });
+    return { body, element: btn };
+  };
 
-  // Letters (unchanged)
+  createButton(window.innerWidth * 0.14, "TABLE", 'btn-table');
+  createButton(window.innerWidth * 0.37, "VENUE", 'btn-venue');
+  createButton(window.innerWidth * 0.60, "SOCIAL", 'btn-social');
+  createButton(window.innerWidth * 0.83, "MENU", 'btn-menu');
+
+  // Letters
   letters = [];
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
