@@ -24,7 +24,7 @@ function initPhysics() {
   buttonBodies = [];
   const baseY = window.innerHeight - 85;
 
-  const createButton = (baseX, text, width, height, id) => {
+  const createButton = (baseX, text, width, height, id, link) => {
     const x = baseX + (Math.random() - 0.5) * 60;
     const y = baseY + (Math.random() - 0.5) * 25;
     const rotation = (Math.random() - 0.5) * 0.22;
@@ -46,25 +46,27 @@ function initPhysics() {
     btn.style.left = (x - width/2) + 'px';
     btn.style.top = (y - height/2) + 'px';
     btn.style.width = width + 'px';
-    document.body.appendChild(btn);
 
+    // Click with delay + message
+    btn.addEventListener('click', () => {
+      showToast("Our menu now opens for you in a new tab...");
+      
+      setTimeout(() => {
+        window.open(link, '_blank');
+      }, 1200); // 1.2 second delay
+    });
+
+    document.body.appendChild(btn);
     return { body, element: btn };
   };
 
-  // Final 4 buttons
-  const tableBtn = createButton(window.innerWidth * 0.15, "TABLE", 195, 72, 'btn-table');
-  tableBtn.element.onclick = () => window.open('https://octotable.com/book/restaurant/1000969/booking/new', '_blank');
+  // Buttons
+  createButton(window.innerWidth * 0.15, "TABLE", 195, 72, 'btn-table', 'https://octotable.com/book/restaurant/1000969/booking/new');
+  createButton(window.innerWidth * 0.38, "VENUE", 145, 55, 'btn-venue', 'https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali');
+  createButton(window.innerWidth * 0.60, "SOCIAL", 155, 65, 'btn-social', 'https://instagram.com/nue.bali');
+  createButton(window.innerWidth * 0.82, "MENU", 160, 58, 'btn-menu', 'https://secure.guestpro.net/nue');
 
-  const venueBtn = createButton(window.innerWidth * 0.38, "VENUE", 145, 55, 'btn-venue');
-  venueBtn.element.onclick = () => window.open('https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali', '_blank');
-
-  const socialBtn = createButton(window.innerWidth * 0.60, "SOCIAL", 155, 65, 'btn-social');
-  socialBtn.element.onclick = () => window.open('https://instagram.com/nue.bali', '_blank');
-
-  const menuBtn = createButton(window.innerWidth * 0.82, "MENU", 160, 58, 'btn-menu');
-  menuBtn.element.onclick = () => window.open('https://secure.guestpro.net/nue', '_blank');
-
-  // Letters
+  // Letters (unchanged)
   letters = [];
   const centerX = window.innerWidth / 2;
   const scale = Math.min(1.05, window.innerWidth / 1200);
@@ -105,8 +107,38 @@ setTimeout(() => {
   });
 }, 200);
 
+// Toast message
+function showToast(message) {
+  const toast = document.createElement('div');
+  toast.style.position = 'fixed';
+  toast.style.bottom = '140px';
+  toast.style.left = '50%';
+  toast.style.transform = 'translateX(-50%)';
+  toast.style.background = 'rgba(212,163,115,0.95)';
+  toast.style.color = '#0A3D2B';
+  toast.style.padding = '14px 28px';
+  toast.style.borderRadius = '50px';
+  toast.style.fontSize = '1.05rem';
+  toast.style.fontWeight = '600';
+  toast.style.zIndex = '200';
+  toast.style.whiteSpace = 'nowrap';
+  toast.style.boxShadow = '0 4px 20px rgba(0,0,0,0.4)';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.transition = 'all 0.4s';
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(20px)';
+    setTimeout(() => toast.remove(), 400);
+  }, 1800);
+}
+
 // Click push closest letter
 document.addEventListener('click', (e) => {
+  // Ignore clicks on buttons
+  if (e.target.tagName === 'BUTTON') return;
+
   let closest = null;
   let minDist = Infinity;
 
