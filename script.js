@@ -37,19 +37,19 @@ function initPhysics() {
 
   // Set 1 (VENUE)
   const set1w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set1h = h * 0.10 * (1.0 + Math.random() * 0.10);
+  const set1h = h * 0.10 * (1.5 + Math.random() * 1.0);   // 150% – 250% of base 10%
 
   // Set 2 (TABLE)
   const set2w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set2h = h * 0.10 * (1.0 + Math.random() * 0.10);
+  const set2h = h * 0.10 * (1.5 + Math.random() * 1.0);
 
   // Set 3 (SOCIAL)
   const set3w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set3h = h * 0.10 * (1.0 + Math.random() * 0.10);
+  const set3h = h * 0.10 * (1.5 + Math.random() * 1.0);
 
   // Set 4 (MENU) – remaining width
   const set4w = w - set1w - set2w - set3w;
-  const set4h = h * 0.10 * (1.0 + Math.random() * 0.10);
+  const set4h = h * 0.10 * (1.5 + Math.random() * 1.0);
 
   // Debug
   const debug = document.getElementById('debug');
@@ -60,7 +60,7 @@ function initPhysics() {
     Set2 (TABLE):  w=${set2w.toFixed(1)}  h=${set2h.toFixed(1)}<br>
     Set3 (SOCIAL): w=${set3w.toFixed(1)}  h=${set3h.toFixed(1)}<br>
     Set4 (MENU):   w=${set4w.toFixed(1)}  h=${set4h.toFixed(1)}<br><br>
-    <span style="color:#7CFF7C">✅ Base values calculated first • Buttons use exact sets • Text distorted inside</span>
+    <span style="color:#7CFF7C">✅ Button height +50–150% • Text 1–2% from edge • Strong random shape</span>
   `;
 
   // =====================================================
@@ -103,8 +103,8 @@ function initPhysics() {
     // =====================================================
     // STEP 3: Random text distortion INSIDE the already-fixed button size
     // =====================================================
-    const textW = buttonWidth * 0.90;
-    const textH = buttonHeight * 0.88;
+    const textW = buttonWidth * 0.99;
+    const textH = buttonHeight * 0.98;
     const distortX = textW / 185;
     const distortY = textH / 68;
     const slant = (Math.random() - 0.5) * 26;
