@@ -60,7 +60,7 @@ function initPhysics() {
     Set2 (TABLE):  w=${set2w.toFixed(1)}  h=${set2h.toFixed(1)}<br>
     Set3 (SOCIAL): w=${set3w.toFixed(1)}  h=${set3h.toFixed(1)}<br>
     Set4 (MENU):   w=${set4w.toFixed(1)}  h=${set4h.toFixed(1)}<br><br>
-    <span style="color:#7CFF7C">✅ Button height +50–150% • Text 1–2% from edge • Strong random shape</span>
+    <span style="color:#7CFF7C">✅ Text width = button width, height = button height • Max variation • 0 margin bottom</span>
   `;
 
   // =====================================================
@@ -103,8 +103,8 @@ function initPhysics() {
     // =====================================================
     // STEP 3: Random text distortion INSIDE the already-fixed button size
     // =====================================================
-    const textW = buttonWidth * 0.99;
-    const textH = buttonHeight * 0.98;
+    const textW = buttonWidth * 1.2;
+    const textH = buttonHeight * 1.2;
     const distortX = textW / 185;
     const distortY = textH / 68;
     const slant = (Math.random() - 0.5) * 26;
