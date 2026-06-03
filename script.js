@@ -1,4 +1,4 @@
-// script.js - NUE Debug with colored button, random text shape, physics letters colliding with button
+// script.js - NUE (4 colored buttons at bottom, random shaped text, letters fall & collide)
 const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Runner } = Matter;
 
 let engine, render;
@@ -21,163 +21,138 @@ function initPhysics() {
     }
   });
 
-  // === TABLE BUTTON: colored, bottom aligned, random sized + randomly shaped text ===
-  // Overall button size (random each reload for nice variation)
-  const targetWidth = 255 + Math.random() * 135;   // 255px to ~390px wide
-  const targetHeight = 80 + Math.random() * 48;    // 80px to ~128px tall
-
-  // Additional distortion for "randomly shaped" text (centered, moderate so it fits nicely)
-  const distortX = 0.82 + Math.random() * 0.55;    // 0.82x – 1.37x (width/condensed effect)
-  const distortY = 0.88 + Math.random() * 0.42;    // 0.88x – 1.30x (height)
-  const slant = (Math.random() - 0.5) * 24;        // +/- 12° skew for dynamic feel
-
-  const buttonWidth = targetWidth;
-  const buttonHeight = targetHeight;
-
-  // Perfect bottom alignment: lower edge touches window bottom (0 margin)
-  const marginBottom = 0;
-  const x = window.innerWidth / 2;
-  const y = window.innerHeight - marginBottom - buttonHeight / 2;
-
-  // Update debug panel with exact calculations
-  const debug = document.getElementById('debug');
-  debug.innerHTML = `
-    <strong>TABLE Button Debug</strong><br><br>
-    Window: ${window.innerWidth} × ${window.innerHeight}px<br>
-    Button size: ${buttonWidth.toFixed(1)} × ${buttonHeight.toFixed(1)} px<br>
-    distortX: ${distortX.toFixed(2)} | distortY: ${distortY.toFixed(2)} | slant: ${slant.toFixed(1)}°<br>
-    Center (x, y): (${x.toFixed(1)}, ${y.toFixed(1)})<br>
-    Lower edge y: ${(y + buttonHeight / 2).toFixed(1)} (equals window height)<br>
-    <span style="color:#7CFF7C">✅ Colored button • Lower edge aligned to bottom (no margin) • Text randomly shaped</span>
-  `;
-
-  // Create colored button (SVG with background rect + distorted text)
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("width", buttonWidth);
-  svg.setAttribute("height", buttonHeight);
-  svg.style.left = (x - buttonWidth / 2) + "px";
-  svg.style.top = (y - buttonHeight / 2) + "px";
-  svg.style.position = "absolute";
-  svg.style.zIndex = "10";
-
-  // Rounded rect background (the visible colored button)
-  const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-  rect.setAttribute("x", "0");
-  rect.setAttribute("y", "0");
-  rect.setAttribute("width", buttonWidth);
-  rect.setAttribute("height", buttonHeight);
-  rect.setAttribute("rx", "16");
-  rect.setAttribute("ry", "16");
-  rect.setAttribute("fill", "#D4A373");
-
-  // Group for centered transform (distortion happens symmetrically around button center)
-  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-  g.setAttribute(
-    "transform",
-    `translate(${buttonWidth / 2}, ${buttonHeight / 2}) scale(${distortX}, ${distortY}) skewX(${slant})`
-  );
-
-  // The text (centered in group → distortion stays nicely inside button)
-  const textEl = document.createElementNS("http://www.w3.org/2000/svg", "text");
-  textEl.setAttribute("x", "0");
-  textEl.setAttribute("y", "0");
-  textEl.setAttribute("text-anchor", "middle");
-  textEl.setAttribute("dominant-baseline", "middle");
-  textEl.setAttribute("fill", "#0A3D2B");
-  textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
-  textEl.setAttribute("font-size", "50");
-  textEl.setAttribute("font-weight", "700");
-  textEl.textContent = "TABLE";
-
-  g.appendChild(textEl);
-  svg.appendChild(rect);
-  svg.appendChild(g);
-  document.body.appendChild(svg);
-
-  // Physics body for the button (static collider - letters will land/bounce on it)
-  const buttonBody = Bodies.rectangle(x, y, buttonWidth, buttonHeight, {
+  // Ground (thin safety net)
+  const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 28, window.innerWidth * 2, 56, {
     isStatic: true,
-    restitution: 0.62,
-    friction: 0.75,
+    restitution: 0.55,
     render: { visible: false }
   });
-  World.add(engine.world, buttonBody);
+  World.add(engine.world, ground);
 
-  // === N U E letters as falling PNGs (physics bodies) - collide with button or fall off bottom ===
+  // === 4 BUTTONS: ~25% width each, colored, 0 margin bottom, strong random text shape ===
+  const margin = 20;
+  const totalWidth = window.innerWidth - margin * 2;
+  const baseY = window.innerHeight - 86;   // lower edge very close to window bottom
+
+  const buttons = [
+    { text: "TABLE",   link: "https://octotable.com/book/restaurant/1000969/booking/new" },
+    { text: "VENUE",   link: "https://maps.google.com/?q=Utara,+Jl.+Pantai+Batu+Mejan+No.126,+Canggu,+Bali" },
+    { text: "SOCIAL",  link: "https://instagram.com/nue.bali" },
+    { text: "MENU",    link: "https://secure.guestpro.net/nue" }
+  ];
+
+  // Proportional widths (sum ~100%, small random each load)
+  let proportions = [0.245, 0.235, 0.265, 0.255];
+  proportions = proportions.map(p => p * (0.93 + Math.random() * 0.14));
+  const sumP = proportions.reduce((a, b) => a + b, 0);
+  proportions = proportions.map(p => p / sumP);
+
+  let currentX = margin;
+
+  buttons.forEach((btn, i) => {
+    const slotWidth = totalWidth * proportions[i];
+
+    // Random size + strong distortion (text still fits well)
+    const widthVar = 0.70 + Math.random() * 0.90;    // 0.70x – 1.60x (condensation/expansion)
+    const heightVar = 0.76 + Math.random() * 0.78;   // 0.76x – 1.54x (height)
+    const slant = (Math.random() - 0.5) * 30;        // +/- 15°
+    const rot = (Math.random() - 0.5) * 0.16;
+
+    const buttonWidth = slotWidth * widthVar * 0.96;
+    const buttonHeight = 76 * heightVar;
+
+    const x = currentX + slotWidth / 2;
+    const y = baseY - buttonHeight / 2;   // lower edge touches bottom (0 margin)
+
+    // Colored button (rounded rect + randomly shaped text)
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("width", buttonWidth);
+    svg.setAttribute("height", buttonHeight);
+    svg.style.left = (x - buttonWidth / 2) + "px";
+    svg.style.top = (y - buttonHeight / 2) + "px";
+    svg.style.position = "absolute";
+    svg.style.zIndex = "10";
+
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", "0");
+    rect.setAttribute("y", "0");
+    rect.setAttribute("width", buttonWidth);
+    rect.setAttribute("height", buttonHeight);
+    rect.setAttribute("rx", "13");
+    rect.setAttribute("ry", "13");
+    rect.setAttribute("fill", "#D4A373");
+
+    const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    g.setAttribute(
+      "transform",
+      `translate(${buttonWidth / 2}, ${buttonHeight / 2}) scale(${widthVar}, ${heightVar}) skewX(${slant})`
+    );
+
+    const textEl = document.createElementNS("http://www.w3.org/2000/svg", "text");
+    textEl.setAttribute("x", "0");
+    textEl.setAttribute("y", "0");
+    textEl.setAttribute("text-anchor", "middle");
+    textEl.setAttribute("dominant-baseline", "middle");
+    textEl.setAttribute("fill", "#0A3D2B");
+    textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
+    textEl.setAttribute("font-size", (buttonHeight * 0.92).toFixed(0));
+    textEl.setAttribute("font-weight", "700");
+    textEl.textContent = btn.text;
+
+    g.appendChild(textEl);
+    svg.appendChild(rect);
+    svg.appendChild(g);
+    document.body.appendChild(svg);
+
+    // Static physics body (letters land on it)
+    const body = Bodies.rectangle(x, y, buttonWidth, buttonHeight, {
+      isStatic: true,
+      restitution: 0.58,
+      friction: 0.72,
+      render: { visible: false }
+    });
+    World.add(engine.world, body);
+
+    svg.addEventListener("click", () => {
+      window.open(btn.link, "_blank");
+    });
+
+    currentX += slotWidth + 12;   // very small clean gap
+  });
+
+  // N U E letters (fall, hit buttons or fall off bottom)
   const scale = Math.min(1.05, window.innerWidth / 1200);
-  const spacing = 255 * scale;
-  const letterY = 118;
-  const letterW = 132 * scale;
-  const letterH = 178 * scale;
+  const spacing = 248 * scale;
+  const letterY = 112;
+  const letterW = 126 * scale;
+  const letterH = 170 * scale;
 
   const letterBodies = [];
 
-  // N
-  const nBody = Bodies.rectangle(
-    window.innerWidth / 2 - spacing,
-    letterY,
-    letterW,
-    letterH,
-    {
-      restitution: 0.52,
-      friction: 0.55,
-      frictionAir: 0.014,
-      render: {
-        sprite: {
-          texture: "assets/n.png",
-          xScale: scale,
-          yScale: scale
-        }
+  const makeLetter = (ox, tex) => {
+    const b = Bodies.rectangle(
+      window.innerWidth / 2 + ox,
+      letterY + (Math.random() - 0.5) * 36,
+      letterW,
+      letterH,
+      {
+        restitution: 0.5,
+        friction: 0.52,
+        frictionAir: 0.012,
+        render: { sprite: { texture: `assets/${tex}.png`, xScale: scale, yScale: scale } }
       }
-    }
-  );
-  letterBodies.push(nBody);
+    );
+    letterBodies.push(b);
+    return b;
+  };
 
-  // U
-  const uBody = Bodies.rectangle(
-    window.innerWidth / 2,
-    letterY + 22,
-    letterW,
-    letterH,
-    {
-      restitution: 0.52,
-      friction: 0.55,
-      frictionAir: 0.014,
-      render: {
-        sprite: {
-          texture: "assets/u.png",
-          xScale: scale,
-          yScale: scale
-        }
-      }
-    }
-  );
-  letterBodies.push(uBody);
+  World.add(engine.world, [
+    makeLetter(-spacing, "n"),
+    makeLetter(0, "u"),
+    makeLetter(spacing, "e")
+  ]);
 
-  // E
-  const eBody = Bodies.rectangle(
-    window.innerWidth / 2 + spacing,
-    letterY - 8,
-    letterW,
-    letterH,
-    {
-      restitution: 0.52,
-      friction: 0.55,
-      frictionAir: 0.014,
-      render: {
-        sprite: {
-          texture: "assets/e.png",
-          xScale: scale,
-          yScale: scale
-        }
-      }
-    }
-  );
-  letterBodies.push(eBody);
-
-  World.add(engine.world, letterBodies);
-
-  // Mouse drag interaction
+  // Mouse drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
@@ -185,23 +160,19 @@ function initPhysics() {
   Runner.run(engine);
   Render.run(render);
 
-  // Remove letters that fall far below screen (they disappear beneath bottom)
+  // Clean up letters that fall off bottom
   setInterval(() => {
     for (let i = letterBodies.length - 1; i >= 0; i--) {
-      if (letterBodies[i].position.y > window.innerHeight + 150) {
+      if (letterBodies[i].position.y > window.innerHeight + 130) {
         World.remove(engine.world, letterBodies[i]);
         letterBodies.splice(i, 1);
       }
     }
-  }, 700);
+  }, 600);
 
-  console.log("%c[NU E] Physics active • Colored button at bottom • Letters collide or fall off screen", "color:#7CFF7C");
+  console.log("%c[NUE] 4 buttons • 0.92× text fill • strong height/condensation variation • 0 margin bottom", "color:#7CFF7C");
 }
 
-// Boot
 initPhysics();
 
-// Simple reload on resize (recalculates random shape + positions)
-window.addEventListener("resize", () => {
-  location.reload();
-});
+window.addEventListener("resize", () => location.reload());
