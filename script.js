@@ -17,7 +17,7 @@ function initPhysics() {
       width: window.innerWidth,
       height: window.innerHeight,
       wireframes: false,
-      background: '#0A3D2B'
+      background: '#f8f9fa'   // clean modern white/off-white
     }
   });
 
@@ -60,7 +60,7 @@ function initPhysics() {
     Set2 (TABLE):  w=${set2w.toFixed(1)}  h=${set2h.toFixed(1)}<br>
     Set3 (SOCIAL): w=${set3w.toFixed(1)}  h=${set3h.toFixed(1)}<br>
     Set4 (MENU):   w=${set4w.toFixed(1)}  h=${set4h.toFixed(1)}<br><br>
-    <span style="color:#7CFF7C">✅ Transparent buttons (no fill) • Gold text • 50% shorter height • Text 1.15×w / 1.7×h</span>
+    <span style="color:#7CFF7C">✅ Clean white background • Dark green text • Transparent buttons • Text 1.15×w / 1.7×h</span>
   `;
 
   // =====================================================
@@ -90,15 +90,9 @@ function initPhysics() {
     svg.style.top = (y - buttonHeight / 2) + "px";
     svg.style.position = "absolute";
     svg.style.zIndex = "10";
+    svg.style.background = "transparent";   // ensure no black background
 
-    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("x", "0");
-    rect.setAttribute("y", "0");
-    rect.setAttribute("width", buttonWidth);
-    rect.setAttribute("height", buttonHeight);
-    rect.setAttribute("rx", "12");
-    rect.setAttribute("ry", "12");
-    // rect.setAttribute("fill", "#D4A373");   // color removed as requested
+    // No rect = fully transparent button (only text visible)
 
     // =====================================================
     // STEP 3: Random text distortion INSIDE the already-fixed button size
@@ -120,7 +114,7 @@ function initPhysics() {
     textEl.setAttribute("y", "0");
     textEl.setAttribute("text-anchor", "middle");
     textEl.setAttribute("dominant-baseline", "middle");
-    textEl.setAttribute("fill", "#D4A373");   // gold text color (button is now transparent)
+    textEl.setAttribute("fill", "#0A3D2B");   // dark green text (matches previous site background)
     textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
     textEl.setAttribute("font-size", "42");
     textEl.setAttribute("font-weight", (620 + Math.random() * 380).toFixed(0));
