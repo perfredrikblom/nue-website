@@ -37,19 +37,19 @@ function initPhysics() {
 
   // Set 1 (VENUE)
   const set1w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set1h = h * 0.10 * (1.5 + Math.random() * 1.0);   // 150% – 250% of base 10%
+  const set1h = h * 0.05 * (1.5 + Math.random() * 1.0);   // 50% height reduction
 
   // Set 2 (TABLE)
   const set2w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set2h = h * 0.10 * (1.5 + Math.random() * 1.0);
+  const set2h = h * 0.05 * (1.5 + Math.random() * 1.0);
 
   // Set 3 (SOCIAL)
   const set3w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set3h = h * 0.10 * (1.5 + Math.random() * 1.0);
+  const set3h = h * 0.05 * (1.5 + Math.random() * 1.0);
 
   // Set 4 (MENU) – remaining width
   const set4w = w - set1w - set2w - set3w;
-  const set4h = h * 0.10 * (1.5 + Math.random() * 1.0);
+  const set4h = h * 0.05 * (1.5 + Math.random() * 1.0);
 
   // Debug
   const debug = document.getElementById('debug');
@@ -60,7 +60,7 @@ function initPhysics() {
     Set2 (TABLE):  w=${set2w.toFixed(1)}  h=${set2h.toFixed(1)}<br>
     Set3 (SOCIAL): w=${set3w.toFixed(1)}  h=${set3h.toFixed(1)}<br>
     Set4 (MENU):   w=${set4w.toFixed(1)}  h=${set4h.toFixed(1)}<br><br>
-    <span style="color:#7CFF7C">✅ Text width = button width, height = button height • Max variation • 0 margin bottom</span>
+    <span style="color:#7CFF7C">✅ Transparent buttons (no fill) • Gold text • 50% shorter height • Text 1.15×w / 1.7×h</span>
   `;
 
   // =====================================================
@@ -98,13 +98,13 @@ function initPhysics() {
     rect.setAttribute("height", buttonHeight);
     rect.setAttribute("rx", "12");
     rect.setAttribute("ry", "12");
-    rect.setAttribute("fill", "#D4A373");
+    // rect.setAttribute("fill", "#D4A373");   // color removed as requested
 
     // =====================================================
     // STEP 3: Random text distortion INSIDE the already-fixed button size
     // =====================================================
-    const textW = buttonWidth * 1.2;
-    const textH = buttonHeight * 1.2;
+    const textW = buttonWidth * 1.15;
+    const textH = buttonHeight * 1.7;
     const distortX = textW / 185;
     const distortY = textH / 68;
     const slant = (Math.random() - 0.5) * 26;
@@ -120,7 +120,7 @@ function initPhysics() {
     textEl.setAttribute("y", "0");
     textEl.setAttribute("text-anchor", "middle");
     textEl.setAttribute("dominant-baseline", "middle");
-    textEl.setAttribute("fill", "#0A3D2B");
+    textEl.setAttribute("fill", "#D4A373");   // gold text color (button is now transparent)
     textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
     textEl.setAttribute("font-size", "42");
     textEl.setAttribute("font-weight", (620 + Math.random() * 380).toFixed(0));
