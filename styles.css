@@ -1,21 +1,7 @@
 /* styles.css */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400..900&display=swap');
-
-body { 
-  margin: 0; 
-  background: #0A3D2B; 
-  overflow: hidden; 
-  font-family: 'Inter', system-ui, sans-serif; 
-}
-
-.physics-button {
-  position: absolute;
-  background: transparent;
-  border: none;
-  color: #D4A373;
-  cursor: pointer;
-  padding: 0;
-  z-index: 100;
-  transition: color 0.25s;
-  white-space: nowrap;
+body {
+  margin: 0;
+  background: #f8f9fa;
+  overflow: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
 }

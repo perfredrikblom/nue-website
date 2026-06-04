@@ -1,4 +1,4 @@
-// script.js - NUE (exact 4-button layout as requested + random text shape inside fixed buttons)
+// script.js - NUE (clean version)
 const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Runner } = Matter;
 
 let engine, render;
@@ -17,11 +17,11 @@ function initPhysics() {
       width: window.innerWidth,
       height: window.innerHeight,
       wireframes: false,
-      background: '#f8f9fa'   // clean modern white/off-white
+      background: '#f8f9fa'
     }
   });
 
-  // Thin safety ground
+  // Thin safety ground at very bottom
   const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 26, window.innerWidth * 2, 52, {
     isStatic: true,
     restitution: 0.55,
@@ -29,60 +29,39 @@ function initPhysics() {
   });
   World.add(engine.world, ground);
 
-  // =====================================================
-  // STEP 1: Pre-calculate 4 sets of base values (once)
-  // =====================================================
-  const w = window.innerWidth;
-  const h = window.innerHeight;
+  // === 4 BUTTONS ===
+  const margin = 20;
+  const totalWidth = window.innerWidth - margin * 2;
 
-  // Set 1 (VENUE)
-  const set1w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set1h = h * 0.05 * (1.5 + Math.random() * 1.0);   // 50% height reduction
-
-  // Set 2 (TABLE)
-  const set2w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set2h = h * 0.05 * (1.5 + Math.random() * 1.0);
-
-  // Set 3 (SOCIAL)
-  const set3w = w * 0.25 * (0.9 + Math.random() * 0.2);
-  const set3h = h * 0.05 * (1.5 + Math.random() * 1.0);
-
-  // Set 4 (MENU) – remaining width
-  const set4w = w - set1w - set2w - set3w;
-  const set4h = h * 0.05 * (1.5 + Math.random() * 1.0);
-
-  // Debug
-  const debug = document.getElementById('debug');
-  debug.innerHTML = `
-    <strong>Exact 4-Button Layout (your spec)</strong><br><br>
-    Window: ${w} × ${h}px<br><br>
-    Set1 (VENUE):  w=${set1w.toFixed(1)}  h=${set1h.toFixed(1)}<br>
-    Set2 (TABLE):  w=${set2w.toFixed(1)}  h=${set2h.toFixed(1)}<br>
-    Set3 (SOCIAL): w=${set3w.toFixed(1)}  h=${set3h.toFixed(1)}<br>
-    Set4 (MENU):   w=${set4w.toFixed(1)}  h=${set4h.toFixed(1)}<br><br>
-    <span style="color:#7CFF7C">✅ Clean white background • Dark green text • Transparent buttons • Text 1.15×w / 1.7×h</span>
-  `;
-
-  // =====================================================
-  // STEP 2: Create buttons using the pre-calculated sets
-  // =====================================================
   const buttonsData = [
-    { setW: set1w, setH: set1h, text: "VENUE",  link: "https://instagram.com/nue.bali" },
-    { setW: set2w, setH: set2h, text: "TABLE",  link: "https://octotable.com/book/restaurant/1000969/booking/new" },
-    { setW: set3w, setH: set3h, text: "SOCIAL", link: "https://instagram.com/nue.bali" },
-    { setW: set4w, setH: set4h, text: "MENU",   link: "https://secure.guestpro.net/nue" }
+    { text: "VENUE",  link: "https://instagram.com/nue.bali" },
+    { text: "TABLE",  link: "https://octotable.com/book/restaurant/1000969/booking/new" },
+    { text: "SOCIAL", link: "https://instagram.com/nue.bali" },
+    { text: "MENU",   link: "https://secure.guestpro.net/nue" }
   ];
 
-  let currentX = 0;
+  // Proportional widths with small random variation
+  let proportions = [0.245, 0.235, 0.265, 0.255];
+  proportions = proportions.map(p => p * (0.93 + Math.random() * 0.14));
+  const sumP = proportions.reduce((a, b) => a + b, 0);
+  proportions = proportions.map(p => p / sumP);
 
-  buttonsData.forEach((b, i) => {
-    const buttonWidth = b.setW;
-    const buttonHeight = b.setH;
+  let currentX = margin;
 
-    const x = currentX + buttonWidth / 2;
-    const y = h - buttonHeight / 2;     // lower edge exactly at window bottom (0 margin)
+  buttonsData.forEach((btn) => {
+    const slotWidth = totalWidth * proportions[buttonsData.indexOf(btn)];
 
-    // Colored button
+    const widthVar = 0.70 + Math.random() * 0.90;
+    const heightVar = 0.76 + Math.random() * 0.78;
+    const slant = (Math.random() - 0.5) * 30;
+
+    const buttonWidth = slotWidth * widthVar * 0.96;
+    const buttonHeight = 76 * heightVar;
+
+    const x = currentX + slotWidth / 2;
+    const y = window.innerHeight - buttonHeight / 2;
+
+    // SVG Button (transparent background + colored distorted text)
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", buttonWidth);
     svg.setAttribute("height", buttonHeight);
@@ -90,23 +69,12 @@ function initPhysics() {
     svg.style.top = (y - buttonHeight / 2) + "px";
     svg.style.position = "absolute";
     svg.style.zIndex = "10";
-    svg.style.background = "transparent";   // ensure no black background
-
-    // No rect = fully transparent button (only text visible)
-
-    // =====================================================
-    // STEP 3: Random text distortion INSIDE the already-fixed button size
-    // =====================================================
-    const textW = buttonWidth * 1.15;
-    const textH = buttonHeight * 1.7;
-    const distortX = textW / 185;
-    const distortY = textH / 68;
-    const slant = (Math.random() - 0.5) * 26;
+    svg.style.background = "transparent";
 
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute(
       "transform",
-      `translate(${buttonWidth / 2}, ${buttonHeight / 2}) scale(${distortX}, ${distortY}) skewX(${slant})`
+      `translate(${buttonWidth / 2}, ${buttonHeight / 2}) scale(${widthVar}, ${heightVar}) skewX(${slant})`
     );
 
     const textEl = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -114,18 +82,17 @@ function initPhysics() {
     textEl.setAttribute("y", "0");
     textEl.setAttribute("text-anchor", "middle");
     textEl.setAttribute("dominant-baseline", "middle");
-    textEl.setAttribute("fill", "#0A3D2B");   // dark green text (matches previous site background)
+    textEl.setAttribute("fill", "#0A3D2B");
     textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
-    textEl.setAttribute("font-size", "42");
-    textEl.setAttribute("font-weight", (620 + Math.random() * 380).toFixed(0));
-    textEl.textContent = b.text;
+    textEl.setAttribute("font-size", (buttonHeight * 0.92).toFixed(0));
+    textEl.setAttribute("font-weight", "700");
+    textEl.textContent = btn.text;
 
     g.appendChild(textEl);
-    svg.appendChild(rect);
     svg.appendChild(g);
     document.body.appendChild(svg);
 
-    // Static physics body (letters can land on it)
+    // Static physics body
     const body = Bodies.rectangle(x, y, buttonWidth, buttonHeight, {
       isStatic: true,
       restitution: 0.58,
@@ -135,18 +102,18 @@ function initPhysics() {
     World.add(engine.world, body);
 
     svg.addEventListener("click", () => {
-      window.open(b.link, "_blank");
+      window.open(btn.link, "_blank");
     });
 
-    currentX += buttonWidth;
+    currentX += slotWidth + 12;
   });
 
-  // N U E letters (fall, hit buttons or fall off bottom)
-  const scale = Math.min(1.05, window.innerWidth / 1200);
-  const spacing = 245 * scale;
+  // N U E letters
+  const scale = Math.min(0.72, window.innerWidth / 1200);
+  const spacing = 320 * scale;
   const letterY = 108;
-  const letterW = 124 * scale;
-  const letterH = 168 * scale;
+  const letterW = 210 * scale;
+  const letterH = 280 * scale;
 
   const letterBodies = [];
 
@@ -159,7 +126,7 @@ function initPhysics() {
       {
         restitution: 0.5,
         friction: 0.52,
-        frictionAir: 0.011,
+        frictionAir: 0.012,
         render: { sprite: { texture: `assets/${tex}.png`, xScale: scale, yScale: scale } }
       }
     );
@@ -173,7 +140,7 @@ function initPhysics() {
     makeLetter(spacing, "e")
   ]);
 
-  // Mouse drag
+  // Mouse / touch drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
@@ -181,19 +148,18 @@ function initPhysics() {
   Runner.run(engine);
   Render.run(render);
 
-  // Remove letters that fall off bottom
+  // Cleanup letters that fall off screen
   setInterval(() => {
     for (let i = letterBodies.length - 1; i >= 0; i--) {
-      if (letterBodies[i].position.y > window.innerHeight + 120) {
+      if (letterBodies[i].position.y > window.innerHeight + 130) {
         World.remove(engine.world, letterBodies[i]);
         letterBodies.splice(i, 1);
       }
     }
-  }, 550);
-
-  console.log("%c[NUE] Exact 4-button layout (your spec) + text inside fixed sizes", "color:#7CFF7C");
+  }, 600);
 }
 
 initPhysics();
 
+// Reload on resize (refreshes random button shapes and positions)
 window.addEventListener("resize", () => location.reload());
