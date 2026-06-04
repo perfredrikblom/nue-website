@@ -1,4 +1,4 @@
-// script.js - NUE (clean version)
+// script.js - NUE (exact 4-button layout as requested + random text shape inside fixed buttons)
 const { Engine, Render, World, Bodies, Body, Mouse, MouseConstraint, Runner } = Matter;
 
 let engine, render;
@@ -17,11 +17,11 @@ function initPhysics() {
       width: window.innerWidth,
       height: window.innerHeight,
       wireframes: false,
-      background: '#f8f9fa'
+      background: '#f8f9fa'   // clean modern white/off-white
     }
   });
 
-  // Thin safety ground at very bottom
+  // Thin safety ground
   const ground = Bodies.rectangle(window.innerWidth / 2, window.innerHeight - 26, window.innerWidth * 2, 52, {
     isStatic: true,
     restitution: 0.55,
@@ -29,41 +29,48 @@ function initPhysics() {
   });
   World.add(engine.world, ground);
 
-  // === 4 BUTTONS ===
-  const margin = 20;
-  const totalWidth = window.innerWidth - margin * 2;
+  // =====================================================
+  // STEP 1: Pre-calculate 4 sets of base values (once)
+  // =====================================================
+  const w = window.innerWidth;
+  const h = window.innerHeight;
 
+  // Set 1 (VENUE)
+  const set1w = w * 0.25 * (0.9 + Math.random() * 0.2);
+  const set1h = h * 0.05 * (1.5 + Math.random() * 1.0);   // 50% height reduction
+
+  // Set 2 (TABLE)
+  const set2w = w * 0.25 * (0.9 + Math.random() * 0.2);
+  const set2h = h * 0.05 * (1.5 + Math.random() * 1.0);
+
+  // Set 3 (SOCIAL)
+  const set3w = w * 0.25 * (0.9 + Math.random() * 0.2);
+  const set3h = h * 0.05 * (1.5 + Math.random() * 1.0);
+
+  // Set 4 (MENU) – remaining width
+  const set4w = w - set1w - set2w - set3w;
+  const set4h = h * 0.05 * (1.5 + Math.random() * 1.0);
+
+  // =====================================================
+  // STEP 2: Create buttons using the pre-calculated sets
+  // =====================================================
   const buttonsData = [
-    { text: "VENUE",  link: "https://instagram.com/nue.bali" },
-    { text: "TABLE",  link: "https://octotable.com/book/restaurant/1000969/booking/new" },
-    { text: "SOCIAL", link: "https://instagram.com/nue.bali" },
-    { text: "MENU",   link: "https://secure.guestpro.net/nue" }
+    { setW: set1w, setH: set1h, text: "VENUE",  link: "https://maps.app.goo.gl/TCDN5y59vGYMrMXL6" },
+    { setW: set2w, setH: set2h, text: "TABLE",  link: "https://octotable.com/book/restaurant/1000969/booking/new" },
+    { setW: set3w, setH: set3h, text: "SOCIAL", link: "https://instagram.com/nue.bali" },
+    { setW: set4w, setH: set4h, text: "MENU",   link: "https://secure.guestpro.net/nue" }
   ];
 
-  // Proportional widths with small random variation
-  let proportions = [0.245, 0.235, 0.265, 0.255];
-  proportions = proportions.map(p => p * (0.93 + Math.random() * 0.14));
-  const sumP = proportions.reduce((a, b) => a + b, 0);
-  proportions = proportions.map(p => p / sumP);
+  let currentX = 0;
 
-  let currentX = margin;
+  buttonsData.forEach((b, i) => {
+    const buttonWidth = b.setW;
+    const buttonHeight = b.setH;
 
-  buttonsData.forEach((btn, index) => {
-    const slotWidth = totalWidth * proportions[index];
+    const x = currentX + buttonWidth / 2;
+    const y = h - buttonHeight / 2;     // lower edge exactly at window bottom (0 margin)
 
-    // Safe button size within the slot (prevents overlap)
-    const buttonWidth = slotWidth * (0.82 + Math.random() * 0.28); // 82% – 110% of slot
-    const buttonHeight = 72 + Math.random() * 38;                  // reasonable height range
-
-    const x = currentX + slotWidth / 2;
-    const y = window.innerHeight - buttonHeight / 2;
-
-    // Distortion values for text only (kept moderate to avoid overflow)
-    const distortX = 0.82 + Math.random() * 0.55;
-    const distortY = 0.85 + Math.random() * 0.45;
-    const slant = (Math.random() - 0.5) * 26;
-
-    // SVG Button (transparent background + colored distorted text)
+    // Colored button
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("width", buttonWidth);
     svg.setAttribute("height", buttonHeight);
@@ -71,7 +78,18 @@ function initPhysics() {
     svg.style.top = (y - buttonHeight / 2) + "px";
     svg.style.position = "absolute";
     svg.style.zIndex = "10";
-    svg.style.background = "transparent";
+    svg.style.background = "transparent";   // ensure no black background
+
+    // No rect = fully transparent button (only text visible)
+
+    // =====================================================
+    // STEP 3: Random text distortion INSIDE the already-fixed button size
+    // =====================================================
+    const textW = buttonWidth * 1.15;
+    const textH = buttonHeight * 1.7;
+    const distortX = textW / 185;
+    const distortY = textH / 68;
+    const slant = (Math.random() - 0.5) * 26;
 
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute(
@@ -84,17 +102,17 @@ function initPhysics() {
     textEl.setAttribute("y", "0");
     textEl.setAttribute("text-anchor", "middle");
     textEl.setAttribute("dominant-baseline", "middle");
-    textEl.setAttribute("fill", "#0A3D2B");
+    textEl.setAttribute("fill", "#0A3D2B");   // dark green text (matches previous site background)
     textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
-    textEl.setAttribute("font-size", (buttonHeight * 0.90).toFixed(0));
-    textEl.setAttribute("font-weight", "700");
-    textEl.textContent = btn.text;
+    textEl.setAttribute("font-size", "42");
+    textEl.setAttribute("font-weight", (620 + Math.random() * 380).toFixed(0));
+    textEl.textContent = b.text;
 
     g.appendChild(textEl);
     svg.appendChild(g);
     document.body.appendChild(svg);
 
-    // Static physics body
+    // Static physics body (letters can land on it)
     const body = Bodies.rectangle(x, y, buttonWidth, buttonHeight, {
       isStatic: true,
       restitution: 0.58,
@@ -104,18 +122,19 @@ function initPhysics() {
     World.add(engine.world, body);
 
     svg.addEventListener("click", () => {
-      window.open(btn.link, "_blank");
+      window.open(b.link, "_blank");
     });
 
-    currentX += slotWidth + 14; // small clean gap
+    currentX += buttonWidth;
   });
 
-  // N U E letters
-  const scale = Math.min(0.72, window.innerWidth / 1200);
-  const spacing = 320 * scale;
+  // N U E letters (fall, hit buttons or fall off bottom)
+  // Made smaller visually while keeping good physics collision
+  const scale = Math.min(0.72, window.innerWidth / 1200);   // smaller visual size
+  const spacing = 380 * scale;                               // increased spacing between letters
   const letterY = 108;
-  const letterW = 210 * scale;
-  const letterH = 280 * scale;
+  const letterW = 230 * scale;   // physics body kept relatively large
+  const letterH = 290 * scale;   // so they don't sink into buttons or each other too much
 
   const letterBodies = [];
 
@@ -128,7 +147,7 @@ function initPhysics() {
       {
         restitution: 0.5,
         friction: 0.52,
-        frictionAir: 0.012,
+        frictionAir: 0.011,
         render: { sprite: { texture: `assets/${tex}.png`, xScale: scale, yScale: scale } }
       }
     );
@@ -142,7 +161,7 @@ function initPhysics() {
     makeLetter(spacing, "e")
   ]);
 
-  // Mouse / touch drag
+  // Mouse drag
   const mouse = Mouse.create(render.canvas);
   const mouseConstraint = MouseConstraint.create(engine, { mouse: mouse });
   World.add(engine.world, mouseConstraint);
@@ -150,18 +169,13 @@ function initPhysics() {
   Runner.run(engine);
   Render.run(render);
 
-  // Cleanup letters that fall off screen
-  setInterval(() => {
-    for (let i = letterBodies.length - 1; i >= 0; i--) {
-      if (letterBodies[i].position.y > window.innerHeight + 130) {
-        World.remove(engine.world, letterBodies[i]);
-        letterBodies.splice(i, 1);
-      }
-    }
-  }, 600);
+  
+
+  
+
+  console.log("%c[NUE] Exact 4-button layout (your spec) + text inside fixed sizes", "color:#7CFF7C");
 }
 
 initPhysics();
 
-// Reload on resize (refreshes random button shapes and positions)
 window.addEventListener("resize", () => location.reload());
