@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Optional: Point to sitemap (we can add this later)
+Sitemap: https://nue.id/sitemap.xml
