@@ -48,18 +48,20 @@ function initPhysics() {
 
   let currentX = margin;
 
-  buttonsData.forEach((btn) => {
-    const slotWidth = totalWidth * proportions[buttonsData.indexOf(btn)];
+  buttonsData.forEach((btn, index) => {
+    const slotWidth = totalWidth * proportions[index];
 
-    const widthVar = 0.70 + Math.random() * 0.90;
-    const heightVar = 0.76 + Math.random() * 0.78;
-    const slant = (Math.random() - 0.5) * 30;
-
-    const buttonWidth = slotWidth * widthVar * 0.96;
-    const buttonHeight = 76 * heightVar;
+    // Safe button size within the slot (prevents overlap)
+    const buttonWidth = slotWidth * (0.82 + Math.random() * 0.28); // 82% – 110% of slot
+    const buttonHeight = 72 + Math.random() * 38;                  // reasonable height range
 
     const x = currentX + slotWidth / 2;
     const y = window.innerHeight - buttonHeight / 2;
+
+    // Distortion values for text only (kept moderate to avoid overflow)
+    const distortX = 0.82 + Math.random() * 0.55;
+    const distortY = 0.85 + Math.random() * 0.45;
+    const slant = (Math.random() - 0.5) * 26;
 
     // SVG Button (transparent background + colored distorted text)
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -74,7 +76,7 @@ function initPhysics() {
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
     g.setAttribute(
       "transform",
-      `translate(${buttonWidth / 2}, ${buttonHeight / 2}) scale(${widthVar}, ${heightVar}) skewX(${slant})`
+      `translate(${buttonWidth / 2}, ${buttonHeight / 2}) scale(${distortX}, ${distortY}) skewX(${slant})`
     );
 
     const textEl = document.createElementNS("http://www.w3.org/2000/svg", "text");
@@ -84,7 +86,7 @@ function initPhysics() {
     textEl.setAttribute("dominant-baseline", "middle");
     textEl.setAttribute("fill", "#0A3D2B");
     textEl.setAttribute("font-family", "Inter, system-ui, sans-serif");
-    textEl.setAttribute("font-size", (buttonHeight * 0.92).toFixed(0));
+    textEl.setAttribute("font-size", (buttonHeight * 0.90).toFixed(0));
     textEl.setAttribute("font-weight", "700");
     textEl.textContent = btn.text;
 
@@ -105,7 +107,7 @@ function initPhysics() {
       window.open(btn.link, "_blank");
     });
 
-    currentX += slotWidth + 12;
+    currentX += slotWidth + 14; // small clean gap
   });
 
   // N U E letters
